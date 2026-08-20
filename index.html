@@ -466,6 +466,48 @@
   pointer-events: none;
 }
 
+
+
+.mode-status-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #00a887;
+  text-transform: uppercase;
+  margin-top: 2px;
+  display: block;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-start {
+  flex: 1;
+  padding: 10px;
+  background: #00a887;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-start.running {
+  background: #ff4d4d; /* Red STOP state when running */
+}
+
+.countdown-text {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffb703;
+  min-width: 32px;
+}
+
   </style>
 
 </head>
@@ -476,37 +518,43 @@
   <div class="subtitle">Real-Time Thermal &amp; Flow Monitoring</div>
 </div>
 
-  <!-- Modern Floating Controls Overlay -->
-  <div class="controls">
-    <div class="control-group">
-      <label for="tempSlider">TCU Temp</label>
-      <div class="value-row">
-        <input type="range" id="tempSlider" min="20" max="180" value="20" />
-        <span class="unit-display"><span id="tempDisplay">20</span> °C</span>
-      </div>
+<!-- Modern Floating Controls Overlay -->
+<div class="controls">
+  <div class="control-group">
+    <label for="tempSlider">TCU Temp</label>
+    <div class="value-row">
+      <input type="range" id="tempSlider" min="20" max="180" value="20" />
+      <span class="unit-display"><span id="tempDisplay">20</span> °C</span>
     </div>
-
-    <div class="control-group">
-      <div class="toggle-row">
-        <label>Flow Control (FC)</label>
-        <label class="switch">
-          <input type="checkbox" id="fcToggle">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <span id="fcStatus">OFF (MAX)</span>
-    </div>
-
-    <div class="control-group">
-      <label for="flowSlider">Manual Flow Rate</label>
-      <div class="value-row">
-        <input type="range" id="flowSlider" min="0" max="100" value="100" />
-        <span class="unit-display"><span id="flowRate">100</span> L/min</span>
-      </div>
-    </div>
-
-    <button id="startBtn" class="btn-start">START</button>
   </div>
+
+  <div class="control-group">
+    <div class="toggle-row">
+      <label>Flow Control (FC)</label>
+      <label class="switch">
+        <input type="checkbox" id="fcToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <span id="fcStatus">OFF (MAX)</span>
+  </div>
+
+  <div class="control-group">
+    <label for="flowSlider">Manual Flow Rate</label>
+    <div class="value-row">
+      <input type="range" id="flowSlider" min="0" max="100" value="100" />
+      <span class="unit-display"><span id="flowRate">100</span> L/min</span>
+    </div>
+  </div>
+
+
+
+  <!-- Start Button & Live Timer Readout -->
+  <div class="button-group">
+    <button id="startBtn" class="btn-start">START</button>
+    <span id="countdownDisplay" class="countdown-text" style="display: none;">15s</span>
+  </div>
+</div>
 
 <!-- BOTTOM RIGHT VALVE STATUS OVERLAY -->
 <div class="valve-overlay bottom-right">
@@ -597,6 +645,8 @@
     </tbody>
   </table>
 </div>
+
+
 
 <svg id="systemSvg" viewBox="-25 50 2000 1000">
       <defs>
@@ -2855,13 +2905,13 @@
   </g>
 
   <!-- CIRCUIT 3 -->
-  <g transform="translate(585, 650)">
+  <g transform="translate(620, 730)">
     <circle r="12" />
     <text y="4">3</text>
   </g>
 
   <!-- CIRCUIT 4 -->
-  <g transform="translate(620, 730)">
+  <g transform="translate(585, 650)">
     <circle r="12" />
     <text y="4">4</text>
   </g>
@@ -2902,7 +2952,7 @@ const thermalHistoryBuffers = {
 };
 
 // Maximum history buffer size (~60 frames = ~1 second delay at 60fps)
-const MAX_DELAY_FRAMES = 5000000;
+const MAX_DELAY_FRAMES = 60;
 
 // Unified Flow Rate Function
 function setCircuitFlowRate(primaryZoneId, flowValue) {
@@ -3056,7 +3106,8 @@ function updatePhysics() {
   const targetSetTemp = tempSlider ? parseFloat(tempSlider.value) : 20;
   const isFcActive = fcToggle ? fcToggle.checked : false;
 
-  // 1. Smoothly transition primary TCU heating element temperature
+  // 1. Primary TCU Heating Element Transition:
+  // When isRunning is false (e.g. cycle ended), currentSupplyTemp decays back to AMBIENT_TEMP
   if (isRunning) {
     currentSupplyTemp += (targetSetTemp - currentSupplyTemp) * DECAY_RATE_BASE;
   } else {
@@ -3244,6 +3295,68 @@ function updateValveVisuals() {
       sliceEl.style.fill = pct === 0 ? '#ff4d4d' : '#00a887';
     }
   }
+}
+
+
+// State tracking variables
+let flowMode = 'infinite'; // 'infinite' or 'timed'
+let cycleTimeout = null;
+let isCycleActive = false;
+
+// Handle Mode Toggle Switch
+function handleModeChange(mode) {
+  flowMode = mode;
+  const timedControls = document.getElementById('timed-controls');
+
+  if (mode === 'timed') {
+    timedControls.style.display = 'flex';
+    isRunning = false; // Stop active flow when switching modes
+  } else {
+    timedControls.style.display = 'none';
+    if (cycleTimeout) clearTimeout(cycleTimeout);
+    isRunning = true; // Auto-resume in continuous mode
+  }
+}
+
+// Start Timed Cycle Function
+function startTimedCycle() {
+  if (flowMode !== 'timed') return;
+
+  const durationInput = document.getElementById('timer-duration');
+  const durationSec = durationInput ? parseFloat(durationInput.value) || 15 : 15;
+  const startBtn = document.getElementById('start-cycle-btn');
+
+  // Clear existing timer if active
+  if (cycleTimeout) clearTimeout(cycleTimeout);
+
+  // Activate flow state
+  isRunning = true;
+  isCycleActive = true;
+  
+  if (startBtn) {
+    startBtn.disabled = true;
+    startBtn.textContent = `RUNNING (${durationSec}s)...`;
+  }
+
+  // Count down and auto-stop after duration
+  let remainingTime = durationSec;
+  const countdownInterval = setInterval(() => {
+    remainingTime--;
+    if (startBtn && remainingTime > 0) {
+      startBtn.textContent = `RUNNING (${remainingTime}s)...`;
+    }
+  }, 1000);
+
+  cycleTimeout = setTimeout(() => {
+    clearInterval(countdownInterval);
+    isRunning = false; // Stops heat supply -> triggers cooling to ambient
+    isCycleActive = false;
+
+    if (startBtn) {
+      startBtn.disabled = false;
+      startBtn.textContent = 'START CYCLE';
+    }
+  }, durationSec * 1000);
 }
 
 // Initialization
