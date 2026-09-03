@@ -523,6 +523,60 @@
   pointer-events: none;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
+
+.mv-formula {
+  font-size: 8px;
+  color: #666;
+  margin-top: 4px;
+  text-align: center;
+  font-family: monospace;
+}
+
+/* Floating Formula Card - Bottom Right Position */
+.formula-card {
+  position: fixed;
+  bottom: 300px;
+  right: 20px;
+  z-index: 1000; /* Keeps it above canvas/other cards */
+  width: 300px;
+  background: rgba(20, 20, 22, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.formula-header {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #00a887;
+  margin-bottom: 6px;
+}
+
+.formula-math {
+  font-size: 11px;
+  color: #a0a0a0;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.formula-live-readout {
+  font-size: 13px;
+  font-weight: 700;
+  color: #00ff88;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 168, 135, 0.3);
+  font-family: monospace;
+}
   </style>
 
 </head>
@@ -556,8 +610,8 @@
   <div class="control-group">
     <label for="flowSlider">Manual Flow Rate</label>
     <div class="value-row">
-      <input type="range" id="flowSlider" min="0" max="100" value="100" />
-      <span class="unit-display"><span id="flowRate">100</span> L/min</span>
+      <input type="range" id="flowSlider" min="0" max="80" value="80" />
+      <span class="unit-display"><span id="flowRate">80</span> L/min</span>
     </div>
   </div>
 
@@ -572,6 +626,19 @@
 
 <!-- BOTTOM RIGHT VALVE STATUS OVERLAY -->
 <!-- BOTTOM RIGHT VALVE & MV STATUS OVERLAY -->
+
+<div class="formula-card">
+  <div class="formula-header">MV Calculation</div>
+  
+  <div class="formula-math">
+    MV(%) = (Target Flow Rate / Maximum Capacity) * 100
+  </div>
+
+  <div class="formula-live-readout" id="live-formula-math">
+    MV = \left(\frac{80 \text{ L/min}}{80 \text{ L/min}}\right) \times 100 = 100\%$$
+  </div>
+</div>
+
 <div class="valve-overlay bottom-right">
   <div class="valve-overlay-header">Flow Control & Manipulated Variable (MV)</div>
   <div class="valve-grid">
@@ -580,7 +647,7 @@
     <div class="valve-card">
       <div class="card-header-row">
         <span class="valve-label">Pipe 1</span>
-        <span class="flow-readout"><strong id="flow-val-1">100</strong> L/min</span>
+        <span class="flow-readout"><strong id="flow-val-1">80</strong> L/min</span>
       </div>
 
       <div class="pie-container">
@@ -607,7 +674,7 @@
     <div class="valve-card">
       <div class="card-header-row">
         <span class="valve-label">Pipe 2</span>
-        <span class="flow-readout"><strong id="flow-val-2">100</strong> L/min</span>
+        <span class="flow-readout"><strong id="flow-val-2">80</strong> L/min</span>
       </div>
 
       <div class="pie-container">
@@ -634,7 +701,7 @@
     <div class="valve-card">
       <div class="card-header-row">
         <span class="valve-label">Pipe 3</span>
-        <span class="flow-readout"><strong id="flow-val-3">100</strong> L/min</span>
+        <span class="flow-readout"><strong id="flow-val-3">80</strong> L/min</span>
       </div>
 
       <div class="pie-container">
@@ -661,7 +728,7 @@
     <div class="valve-card">
       <div class="card-header-row">
         <span class="valve-label">Pipe 4</span>
-        <span class="flow-readout"><strong id="flow-val-4">100</strong> L/min</span>
+        <span class="flow-readout"><strong id="flow-val-4">80</strong> L/min</span>
       </div>
 
       <div class="pie-container">
@@ -701,22 +768,22 @@
       <tr>
         <td>1</td>
         
-        <td><input type="number" class="zone-flow-input" data-zone="8" value="100" min="0" max="100"></td>
+        <td><input type="number" class="zone-flow-input" data-zone="8" value="80" min="0" max="80"></td>
       </tr>
       <tr>
         <td>2</td>
         
-        <td><input type="number" class="zone-flow-input" data-zone="9" value="100" min="0" max="100"></td>
+        <td><input type="number" class="zone-flow-input" data-zone="9" value="80" min="0" max="80"></td>
       </tr>
       <tr>
         <td>3</td>
         
-        <td><input type="number" class="zone-flow-input" data-zone="1" value="100" min="0" max="100"></td>
+        <td><input type="number" class="zone-flow-input" data-zone="1" value="80" min="0" max="80"></td>
       </tr>
       <tr>
         <td>4</td>
         
-        <td><input type="number" class="zone-flow-input" data-zone="10" value="100" min="0" max="100"></td>
+        <td><input type="number" class="zone-flow-input" data-zone="10" value="80" min="0" max="80"></td>
       </tr>
     </tbody>
   </table>
@@ -2954,16 +3021,8 @@
 <script>
 const zoneAnimations = {};
 const zoneFlowRates = { 
-  1: 100, // Inj -> Mold #3
-  2: 100, // Mold -> Inj #1
-  3: 100, // Mold -> Inj #4
-  4: 100, // Mold -> Inj #3
-  5: 100, // Mold -> Inj #2
-  6: 100, // Main Out
-  7: 100, // Main In
-  8: 100, // Inj -> Mold #1
-  9: 100, // Inj -> Mold #2
-  10: 100 // Inj -> Mold #4
+  1: 80, 2: 80, 3: 80, 4: 80, 5: 80, 
+  6: 80, 7: 80, 8: 80, 9: 80, 10: 80 
 };
 
 // Map Supply Zones to their matching Return Zones
@@ -2986,7 +3045,8 @@ const MAX_DELAY_FRAMES = 60;
 // Unified Flow Rate Function
 function setCircuitFlowRate(primaryZoneId, flowValue) {
   const isFcActive = fcToggle ? fcToggle.checked : false;
-  const effectiveFlow = isFcActive ? flowValue : 100;
+  const clampedFlow = Math.min(Math.max(flowValue || 0, 0), 80);
+const effectiveFlow = isFcActive ? clampedFlow : 80;
   
   const pairedZoneId = circuitPairs[primaryZoneId] || 
                        Object.keys(circuitPairs).find(key => circuitPairs[key] == primaryZoneId);
@@ -2997,7 +3057,7 @@ function setCircuitFlowRate(primaryZoneId, flowValue) {
   zonesToUpdate.forEach(zId => {
     zoneFlowRates[zId] = effectiveFlow;
 
-    const playbackSpeed = effectiveFlow > 0 ? 0.3 + (effectiveFlow / 100) * 2.7 : 0;
+    const playbackSpeed = effectiveFlow > 0 ? 0.3 + (effectiveFlow / 80) * 2.7 : 0;
 
     // Update animations
     if (zoneAnimations[zId]) {
@@ -3124,12 +3184,23 @@ function syncSystemState() {
   }
 
   document.querySelectorAll('.zone-flow-input').forEach(input => {
-    input.disabled = !isFcActive;
-    const zoneId = input.getAttribute('data-zone');
-    const flowVal = isFcActive ? (parseFloat(input.value) || 0) : 100;
-    setZoneFlowRate(zoneId, flowVal);
-  });
-}
+  input.disabled = !isFcActive;
+  const zoneId = input.getAttribute('data-zone');
+  
+  // Read and clamp typed input between 0 and 80 L/min
+  let parsedVal = parseFloat(input.value);
+  if (isNaN(parsedVal) || parsedVal < 0) parsedVal = 0;
+  if (parsedVal > MAX_RATED_FLOW) {
+    parsedVal = MAX_RATED_FLOW;
+    input.value = MAX_RATED_FLOW; // Reset visual input field if user typed > 80
+  }
+
+  // Use clamped input when FC is active; fallback to 80 (not 100) when FC is inactive
+  const flowVal = isFcActive ? parsedVal : MAX_RATED_FLOW;
+  
+  setZoneFlowRate(zoneId, flowVal);
+});
+} 
 
 function updatePhysics() {
   const targetSetTemp = tempSlider ? parseFloat(tempSlider.value) : 20;
@@ -3227,11 +3298,32 @@ function updatePhysics() {
 }
 
 // Table Input Event Listener
-document.addEventListener('input', (e) => {
-  if (e.target.classList.contains('zone-flow-input')) {
-    const primaryZoneId = e.target.getAttribute('data-zone');
-    const flowVal = parseFloat(e.target.value) || 0;
-    setCircuitFlowRate(primaryZoneId, flowVal);
+// Table Input Event Listener (Realtime Sync & Cap)
+document.addEventListener('input', (event) => {
+  // Target your zone flow inputs or master slider
+  if (event.target.classList.contains('zone-flow-input') || event.target.id === 'flowSlider') {
+    const MAX = 80;
+    let val = parseFloat(event.target.value);
+
+    // Hard clamp values above 80 or below 0
+    if (val > MAX) {
+      event.target.value = MAX;
+      val = MAX;
+    } else if (val < 0 || isNaN(val)) {
+      val = 0;
+    }
+
+    // REALTIME FIX: Update zone data and trigger valve overlay refreshes immediately!
+    if (event.target.classList.contains('zone-flow-input')) {
+      const primaryZoneId = event.target.getAttribute('data-zone');
+      if (primaryZoneId) {
+        // Update circuit flow and sync paired supply/return zones
+        setCircuitFlowRate(primaryZoneId, val);
+      }
+    }
+
+    // Force an immediate UI redraw across all valve overlays
+    updateValveVisuals();
   }
 });
 
@@ -3281,51 +3373,6 @@ const valveZoneMap = {
   3: 1,  // Pipe 3 -> Zone 1
   4: 10  // Pipe 4 -> Zone 10
 };
-
-// Generates an SVG path string for a pie wedge
-// Generates an accurate SVG path string for a pie wedge
-function getPiePath(percentage) {
-  // 1. 0% -> Empty path
-  if (percentage <= 0) return '';
-
-  // 2. 100% -> Full circle path (starts at top, sweeps 360 deg to near top)
-  if (percentage >= 100) {
-    return 'M 0 -1 A 1 1 0 1 1 -0.0001 -1 Z';
-  }
-
-  // 3. Partial percentage slice (clockwise from 12 o'clock)
-  const angle = (percentage / 100) * 360;
-  const rad = (angle - 90) * (Math.PI / 180);
-
-  const x = Math.cos(rad);
-  const y = Math.sin(rad);
-  const largeArc = angle > 180 ? 1 : 0;
-
-  return `M 0 0 L 0 -1 A 1 1 0 ${largeArc} 1 ${x.toFixed(4)} ${y.toFixed(4)} Z`;
-}
-
-function updateValveVisuals() {
-  const isFcActive = fcToggle ? fcToggle.checked : false;
-
-  for (let i = 1; i <= 4; i++) {
-    const primaryZone = valveZoneMap[i];
-    const rawFlow = zoneFlowRates[primaryZone] !== undefined ? zoneFlowRates[primaryZone] : 100;
-    const flowVal = isFcActive ? rawFlow : 100;
-    const pct = Math.max(0, Math.min(100, Math.round(flowVal)));
-
-    // 1. Text badge update
-    const pctEl = document.getElementById(`valve-pct-${i}`);
-    if (pctEl) pctEl.textContent = `${pct}%`;
-
-    // 2. Pie slice path & color update
-    const sliceEl = document.getElementById(`pie-slice-${i}`);
-    if (sliceEl) {
-      sliceEl.setAttribute('d', getPiePath(pct));
-      sliceEl.style.fill = pct === 0 ? '#ff4d4d' : '#00a887';
-    }
-  }
-}
-
 
 // State tracking variables
 let flowMode = 'infinite'; // 'infinite' or 'timed'
@@ -3388,7 +3435,7 @@ function startTimedCycle() {
   }, durationSec * 1000);
 }
 
-const MAX_RATED_FLOW = 100; // 100 L/min
+const MAX_RATED_FLOW = 80; // 100 L/min = 100% MV
 
 function calculateStellgrad(flowLmin) {
   if (flowLmin <= 0) return 0;
@@ -3398,15 +3445,31 @@ function calculateStellgrad(flowLmin) {
 }
 
 function updateValveVisuals() {
-  const isFcActive = document.getElementById('fcToggle').checked;
+  const fcToggleEl = document.getElementById('fcToggle');
+  const flowSliderEl = document.getElementById('flowSlider'); // Master Flow Slider
+  const isFcActive = fcToggleEl ? fcToggleEl.checked : false;
+
+  // Maximum rated capacity for the system
+  const MAX_RATED_FLOW = 80;
+
+  // Read value from master slider if FC is inactive, default to 80
+  const masterFlow = flowSliderEl ? parseFloat(flowSliderEl.value) || MAX_RATED_FLOW : MAX_RATED_FLOW;
 
   for (let i = 1; i <= 4; i++) {
-    // Read corresponding zone input value or default
-    const zoneInput = document.querySelector(`.zone-flow-input[data-zone]`); 
-    const targetFlow = isFcActive ? (zoneInput ? parseFloat(zoneInput.value) : 100) : 100;
+    const primaryZone = valveZoneMap[i];
     
-    // Calculate Manipulated Variable %
-    const stellgradY = calculateStellgrad(targetFlow);
+    // Read raw flow from zone map, or fallback to MAX_RATED_FLOW
+    const rawFlow = zoneFlowRates[primaryZone] !== undefined ? zoneFlowRates[primaryZone] : MAX_RATED_FLOW;
+    
+    // IF FC active -> Use individual zone flow
+    // IF FC inactive -> Use Master Slider flow (instead of hardcoded 100)
+    let targetFlow = isFcActive ? rawFlow : masterFlow;
+
+    // Clamp value between 0 and 80 L/min
+    targetFlow = Math.min(Math.max(targetFlow, 0), MAX_RATED_FLOW);
+
+    // Calculate Manipulated Variable % (Stellgrad Y) based on 80 L/min max capacity
+    const stellgradY = Math.round((targetFlow / MAX_RATED_FLOW) * 100);
 
     // 1. Update Flow Readout
     const flowEl = document.getElementById(`flow-val-${i}`);
@@ -3419,33 +3482,60 @@ function updateValveVisuals() {
     const mvPctEl = document.getElementById(`mv-pct-${i}`);
     if (mvPctEl) mvPctEl.textContent = `${stellgradY}%`;
 
-    // 3. Update MV Progress Bar
+    // 3. Update MV Progress Bar Fill
     const mvFillEl = document.getElementById(`mv-fill-${i}`);
     if (mvFillEl) mvFillEl.style.width = `${stellgradY}%`;
 
-    // 4. Update SVG Pie Slice Geometry
+    // 4. Update Live Formula Readout under each bar
+    const formulaEl = document.getElementById(`mv-formula-${i}`);
+    if (formulaEl) {
+      formulaEl.textContent = `Y = ${Math.round(targetFlow)}/${MAX_RATED_FLOW} × 100 = ${stellgradY}%`;
+    }
+
+    // 5. Update SVG Pie Slice Geometry & Color
     const sliceEl = document.getElementById(`pie-slice-${i}`);
     if (sliceEl) {
       sliceEl.setAttribute('d', getPiePath(stellgradY));
+      sliceEl.style.fill = stellgradY === 0 ? '#ff4d4d' : '#00a887';
     }
+  }
+
+  // Optional: Update a main global formula panel if present in your HTML
+  const globalFormulaEl = document.getElementById('live-formula-math');
+  if (globalFormulaEl) {
+    const activeDisplayFlow = isFcActive 
+      ? (zoneFlowRates[valveZoneMap[1]] !== undefined ? zoneFlowRates[valveZoneMap[1]] : MAX_RATED_FLOW)
+      : masterFlow;
+    const clampedFlow = Math.min(Math.max(activeDisplayFlow, 0), MAX_RATED_FLOW);
+    const overallMV = Math.round((clampedFlow / MAX_RATED_FLOW) * 100);
+    
+    globalFormulaEl.textContent = `Y = (${Math.round(clampedFlow)} L/min ÷ ${MAX_RATED_FLOW} L/min) × 100 = ${overallMV}%`;
   }
 }
 
-// Helper: Generates SVG arc path for pie slice based on percentage
+// Generates SVG path string for pie slice based on percentage
 function getPiePath(pct) {
+  // 100% -> Full Circle
   if (pct >= 100) return "M 0 -1 A 1 1 0 1 1 -0.0001 -1 Z";
-  if (pct <= 0) return "M 0 0 L 0 -1 Z";
   
+  // 0% -> Empty
+  if (pct <= 0) return "M 0 0 L 0 -1 Z";
+
+  // Calculate arc angle in radians
   const rad = (pct / 100) * 2 * Math.PI;
   const x = Math.sin(rad);
   const y = -Math.cos(rad);
   const largeArc = pct > 50 ? 1 : 0;
-  
-  return `M 0 0 L 0 -1 A 1 1 0 ${largeArc} 1 ${x} ${y} Z`;
+
+  // Draws: Center (0,0) -> Top (0,-1) -> Arc to (x,y) -> Close back to Center (0,0)
+  return `M 0 0 L 0 -1 A 1 1 0 ${largeArc} 1 ${x.toFixed(4)} ${y.toFixed(4)} Z`;
 }
+
 
 // Initialization
 initFlowAnimations();
 syncSystemState();
 updatePhysics();
+
+
 </script>
