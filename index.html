@@ -596,22 +596,33 @@
     </div>
   </div>
 
-  <div class="control-group">
-    <div class="toggle-row">
-      <label>Flow Control (FC)</label>
-      <label class="switch">
-        <input type="checkbox" id="fcToggle">
-        <span class="slider"></span>
-      </label>
-    </div>
-    <span id="fcStatus">OFF (MAX)</span>
+<!-- Flow Control (FC) Toggle -->
+<div class="control-group">
+  <div class="toggle-row">
+    <label>Flow Control (FC)</label>
+    <label class="switch">
+      <input type="checkbox" id="fcToggle">
+      <span class="slider"></span>
+    </label>
   </div>
+</div>
+
+<!-- Manipulated Variable (MV) Toggle -->
+<div class="control-group">
+  <div class="toggle-row">
+    <label>Manipulated Variable (MV)</label>
+    <label class="switch">
+      <input type="checkbox" id="mvToggle" checked> <!-- Add 'checked' if default is ON -->
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
 
   <div class="control-group">
     <label for="flowSlider">Manual Flow Rate</label>
     <div class="value-row">
       <input type="range" id="flowSlider" min="0" max="80" value="80" />
-      <span class="unit-display"><span id="flowRate">80</span> L/min</span>
+      <span class="unit-display"><span id="flowRate">80</span>
     </div>
   </div>
 
@@ -761,7 +772,7 @@
     <thead>
       <tr>
         <th>Circuit</th>
-        <th>Flow (L/min)</th>
+        <th id="flow-column-header">Flow (L/min)</th>
       </tr>
     </thead>
     <tbody>
@@ -807,10 +818,7 @@
     </g>
 
 
-    <g transform="translate(336 588)">
-      <path d="M150.7 0L0 87.4L0 178.1L150.7 265.5L301.4 178.1L301.4 87.4L150.7 0Z" fill="#FF0000" />
-    </g>
-
+  
 
     
 
@@ -824,40 +832,19 @@
   />
 </g>
 
-    <g transform="translate(336 588)">
-      <path d="M150.7 174.9L301.4 87.4L150.7 0L0 87.4L150.7 174.9ZM301.4 178.1L150.7 265.5L150.7 174.9L301.4 87.4L301.4 178.1ZM0 178.1L150.7 265.5L150.7 174.9L0 87.4L0 178.1Z" fill="none" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(0.5 0.5)" />
-      <path d="M0 6.38513C0 2.85872 2.20471 0 4.92438 0C7.64401 0 9.84872 2.85872 9.84872 6.38513C9.84872 9.91154 7.64401 12.7703 4.92438 12.7703C2.20471 12.7703 0 9.91154 0 6.38513Z" fill="none" stroke-width="0.5" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(262.456 158.454)" />
-      <path d="M0 6.38513C0 2.85872 2.20471 0 4.92435 0C7.644 0 9.84871 2.85872 9.84871 6.38513C9.84871 9.91156 7.644 12.7703 4.92435 12.7703C2.20471 12.7703 0 9.91156 0 6.38513Z" fill="none" stroke-width="0.5" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(186.066 203.999)" />
-      <path d="M0 6.38513C0 2.85872 2.20471 0 4.92436 0C7.644 0 9.84872 2.85872 9.84872 6.38513C9.84872 9.91154 7.644 12.7703 4.92436 12.7703C2.20471 12.7703 0 9.91154 0 6.38513Z" fill="none" stroke-width="0.5" stroke="#000000" stroke-opacity="0.1" stroke-linecap="round" stroke-linejoin="round" transform="translate(115.689 71.733)" />
-      <path d="M0 6.38513C0 2.85872 2.20471 0 4.92436 0C7.644 0 9.84872 2.85872 9.84872 6.38513C9.84872 9.91154 7.644 12.7703 4.92436 12.7703C2.20471 12.7703 0 9.91154 0 6.38513Z" fill="none" stroke-width="0.5" stroke="#000000" stroke-opacity="0.1" stroke-linecap="round" stroke-linejoin="round" transform="translate(39.299 117.279)" />
-      <path d="M108.8 35.4L132.7 49.2L145 42.1L122.8 29.1L117.2 32.3L89.3 16.1L94.9 12.9L72.7 0L72.5 45.3L82.4 51M27.8 51.7L22.3 55L0 42.1L13.1 34.7L25.4 42L53.1 25.9L41 18.6L72.7 0L72.5 45.3L44.8 61.6M145 42.1L132.7 49.2L108.8 35.4L75.6 55L99.5 68.6L72.5 84.2L50.4 71.3L55.8 68L27.8 51.7L22.3 55L0 42.1M25.4 53L25.4 42L53.1 25.9M25.4 53L25.4 42L13.1 34.7L13.1 49.6M117.1 32.3L89.2 16.1L89.2 47" fill="none" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(78.6 45.9)" />
-      <path d="M5.39999 42.1L5.39999 48.6L0 45.4L5.39999 42.1ZM25.2 29.1L25.2 56.5L48.8999 42.9L25.2 29.1ZM72.4 3.20001L72.4 17M66.8 6.39999L66.8 14.3M2.69995 0L2.69995 30.8" fill="none" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(129 71.8)" />
-    </g>
-
+<!-- <g id="IMM" transform="translate(336 588)">
+  <image 
+    href="IMM.png" 
+    x="-200" 
+    y="-137" 
+    width="570" 
+    height="370" 
+  />
+</g> -->
 
     
-    
-    <g transform="translate(336 498)">
-      <path d="M150.7 0L0 87.4L0 178.1L150.7 265.5L301.4 178.1L301.4 87.4L150.7 0Z" fill="#FF0000" />
-    </g>
 
 
-    <g transform="translate(336 498)">
-      <path d="M150.7 174.9L301.4 87.4L150.7 0L0 87.4L150.7 174.9ZM78.1 87.5" fill="none" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(0.5 0.5)" />
-      <path d="M0 90.7L150.7 178.1L150.7 87.5L0 0L0 90.7ZM301.4 90.7L150.7 178.1L150.7 87.5L301.4 0L301.4 90.7Z" fill="none" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(0.5 87.9)" />
-      <path d="M0 6.38513C0 2.85872 2.20471 0 4.92435 0C7.644 0 9.84871 2.85872 9.84871 6.38513C9.84871 9.91154 7.644 12.7703 4.92435 12.7703C2.20471 12.7703 0 9.91154 0 6.38513Z" fill="none" stroke-width="0.5" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(184.665 196.573)" />
-      <path d="M0 6.38513C0 2.85872 2.20471 0 4.92438 0C7.64401 0 9.84872 2.85872 9.84872 6.38513C9.84872 9.91154 7.64401 12.7703 4.92438 12.7703C2.20471 12.7703 0 9.91154 0 6.38513Z" fill="none" stroke-width="0.5" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(264.247 152.392)" />
-      <path d="M0 6.38513C0 2.85872 2.20471 0 4.92436 0C7.644 0 9.84872 2.85872 9.84872 6.38513C9.84872 9.91154 7.644 12.7703 4.92436 12.7703C2.20471 12.7703 0 9.91154 0 6.38513Z" fill="none" stroke-width="0.5" stroke="#000000" stroke-opacity="0.1" stroke-linecap="round" stroke-linejoin="round" transform="translate(117.48 65.67)" />
-      <path d="M0 6.38513C0 2.85872 2.20471 0 4.92436 0C7.644 0 9.84872 2.85872 9.84872 6.38513C9.84872 9.91154 7.644 12.7703 4.92436 12.7703C2.20471 12.7703 0 9.91154 0 6.38513Z" fill="none" stroke-width="0.5" stroke="#000000" stroke-opacity="0.1" stroke-linecap="round" stroke-linejoin="round" transform="translate(37.898 109.853)" />
-      <g transform="translate(129 65.9)">
-        <path d="M0 0L0 0ZM21.3 0L21.3 0Z" fill="#FFFFFF" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(11.5 12.8)" />
-        <path d="M0 10L22.2 22.8L22.2 12.9L0 0L0 10Z" fill="#C8C8C8" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 12.8)" />
-        <path d="M22.1 10L0 22.8L0 12.9L22.1 0L22.1 10Z" fill="#ECECEC" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(22.2 12.8)" />
-        <path d="M22.2 25.7L44.3 12.8L22.2 0L0 12.8L22.2 25.7ZM19 26.3L19 26.3ZM25.3 26.3L25.3 26.3Z" fill="#FFFFFF" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M13.1 0L0 7.6L13 15.1L13.1 0Z" fill="#ECECEC" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(9.1 5.3)" />
-        <path d="M0.100006 0L0 15.1L13.1 7.6L0.100006 0ZM0.0999756 0L0.0999756 0Z" fill="#FFFFFF" stroke-width="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(22.1 5.3)" />
-      </g>
-    </g>
 
 
     <g id="molding" clip-path="url(#clip_path_1)" transform="translate(998 420)">
@@ -2896,60 +2883,76 @@
     
     <!-- Base Pipes -->
 <!-- LAYER 1: WHITE GAP OUTLINE (Depth Masking) -->
-<g class="pipe-outline">
+<!-- 1. BOTTOM PIPES (Zones 2, 3, 4, 5) -->
+<g class="bottom-pipes">
+  <!-- Outlines -->
+  <g class="pipe-outline">
+    <path data-zone="2" d="M0 235.99L405.372 0L722.401 183.745" transform="translate(340 272.01)" />
+    <path data-zone="3" d="M0 239.558L416.781 0L681.998 149.953" transform="translate(350 325.442)" />
+    <path data-zone="4" d="M0 231.5L398 0L645.193 137.408" transform="translate(370 348.5)" />
+    <path data-zone="5" d="M0 238.366L412.045 0L699.998 166.746" transform="translate(350 298.597)" />
+  </g>
 
-  
-  <!-- Zone 1 -->
-  <path data-zone="1" d="M0 156L130.816 233.785L534 0" transform="translate(606 600)" />
-  
-  <!-- Zone 2 (Main Supply) -->
-  <path data-zone="2" d="M180 328.663L130 298.663L130 395.663L0 318.663L547.701 0L900 204.006" transform="translate(150 261.337)" />
-  
-  <!-- Zone 3 (Main Return) -->
-  <path data-zone="3" d="M221 297.809L171 267.809L171 388.809L0 287.809L503.925 0L872.401 213.564" transform="translate(190 242.191)" />
-  
-  <!-- Zone 4 (Return Path 1) -->
-  <path data-zone="4" d="M0 156.975L264.895 0L470.089 115.908" transform="translate(545.104 370)" />
-  
-  <!-- Zone 5 (Return Path 2) -->
-  <path data-zone="5" d="M0 168.096L286.751 0L518.749 135.395" transform="translate(513.249 340)" />
-  
-  <!-- Mold Edge Loop Paths -->
-  <path data-zone="6" d="M0 380L143 466L553 230L156 0" transform="translate(1217 250)" />
-  <path data-zone="7" d="M0 322L119 389.406L453.729 194.542L119 0" transform="translate(1254 280)" />
-  <path data-zone="8" d="M0 81L46.3649 107.749L46.3649 349.448L648 0" transform="translate(526 620)" />
-  <path data-zone="9" d="M0 188.163L151.429 278.467L634 0" transform="translate(526 610)" />
-  <path data-zone="10" d="M0 65L83 115L83 175L150 215L519 0" transform="translate(606 592.5)" />
+  <!-- Base Colors -->
+  <g class="pipe-base">
+    <path data-zone="2" d="M0 235.99L405.372 0L722.401 183.745" transform="translate(340 272.01)" />
+    <path data-zone="3" d="M0 239.558L416.781 0L681.998 149.953" transform="translate(350 325.442)" />
+    <path data-zone="4" d="M0 231.5L398 0L645.193 137.408" transform="translate(370 348.5)" />
+    <path data-zone="5" d="M0 238.366L412.045 0L699.998 166.746" transform="translate(350 298.597)" />
+  </g>
+
+  <!-- Animated Flow -->
+  <g class="pipe-flow">
+    <path data-zone="2" d="M0 235.99L405.372 0L722.401 183.745" transform="translate(340 272.01)" />
+    <path data-zone="3" d="M0 239.558L416.781 0L681.998 149.953" transform="translate(350 325.442)" />
+    <path data-zone="4" d="M0 231.5L398 0L645.193 137.408" transform="translate(370 348.5)" />
+    <path data-zone="5" d="M0 238.366L412.045 0L699.998 166.746" transform="translate(350 298.597)" />
+  </g>
 </g>
 
-<!-- LAYER 2: BASE FLUID COLOR -->
-<g class="pipe-base">
-  <path data-zone="1" d="M0 156L130.816 233.785L534 0" transform="translate(606 600)" />
-  <path data-zone="2" d="M180 328.663L130 298.663L130 395.663L0 318.663L547.701 0L900 204.006" transform="translate(150 261.337)" />
-  <path data-zone="3" d="M221 297.809L171 267.809L171 388.809L0 287.809L503.925 0L872.401 213.564" transform="translate(190 242.191)" />
-  <path data-zone="4" d="M0 156.975L264.895 0L470.089 115.908" transform="translate(545.104 370)" />
-  <path data-zone="5" d="M0 168.096L286.751 0L518.749 135.395" transform="translate(513.249 340)" />
-  <path data-zone="6" d="M0 380L143 466L553 230L156 0" transform="translate(1217 250)" />
-  <path data-zone="7" d="M0 322L119 389.406L453.729 194.542L119 0" transform="translate(1254 280)" />
-  <path data-zone="8" d="M0 81L46.3649 107.749L46.3649 349.448L648 0" transform="translate(526 620)" />
-  <path data-zone="9" d="M0 188.163L151.429 278.467L634 0" transform="translate(526 610)" />
-  <path data-zone="10" d="M0 65L83 115L83 175L150 215L519 0" transform="translate(606 592.5)" />
+<!-- 2. MIDDLE LAYER (PNG Image rendered on top of 2, 3, 4, 5) -->
+<g id="IMM" transform="translate(336 588)">
+  <image 
+    href="IMM.png" 
+    x="-200" 
+    y="-137" 
+    width="570" 
+    height="370" 
+  />
 </g>
 
-<!-- LAYER 3: ANIMATED DASHED FLOW -->
-<g class="pipe-flow">
-  <path data-zone="1" class="flow-backward" d="M0 156L130.816 233.785L534 0" transform="translate(606 600)" />
-  <path data-zone="2" class="flow-forward" d="M180 328.663L130 298.663L130 395.663L0 318.663L547.701 0L900 204.006" transform="translate(150 261.337)" />
-  <path data-zone="3" class="flow-forward" d="M221 297.809L171 267.809L171 388.809L0 287.809L503.925 0L872.401 213.564" transform="translate(190 242.191)" />
-  <path data-zone="4" class="flow-forward" d="M0 156.975L264.895 0L470.089 115.908" transform="translate(545.104 370)" />
-  <path data-zone="5" class="flow-forward" d="M0 168.096L286.751 0L518.749 135.395" transform="translate(513.249 340)" />
-  <path data-zone="6" class="flow-forward" d="M0 380L143 466L553 230L156 0" transform="translate(1217 250)" />
-  <path data-zone="7" class="flow-backward" d="M0 322L119 389.406L453.729 194.542L119 0" transform="translate(1254 280)" />
-  <path data-zone="8" class="flow-backward" d="M0 81L46.3649 107.749L46.3649 349.448L648 0" transform="translate(526 620)" />
-  <path data-zone="9" class="flow-backward" d="M0 188.163L151.429 278.467L634 0" transform="translate(526 610)" />
-  <path data-zone="10" class="flow-backward" d="M0 65L83 115L83 175L150 215L519 0" transform="translate(606 592.5)" />
-</g>
+<!-- 3. TOP PIPES (Zones 1, 6, 7, 8, 9, 10 rendered on top of PNG) -->
+<g class="top-pipes">
+  <!-- Outlines -->
+  <g class="pipe-outline">
+    <path data-zone="1" d="M0 100L51.7094 130L51.7094 186.747L130.816 233.785L534 0" transform="translate(606 600)" />
+    <path data-zone="6" d="M0 380L143 466L553 230L156 0" transform="translate(1217 250)" />
+    <path data-zone="7" d="M0 322L119 389.406L453.729 194.542L119 0" transform="translate(1254 280)" />
+    <path data-zone="8" d="M0 80L66.0002 118.324L66.0002 317.111L614 0" transform="translate(560 620)" />
+    <path data-zone="9" d="M0 124.93L32.4639 143.732L32.4639 227.798L117.429 278.467L599.998 0" transform="translate(560 610)" />
+    <path data-zone="10" d="M0 82.5L83 130.326L83 175L150 215L519 0" transform="translate(606 592.5)" />
+  </g>
 
+  <!-- Base Colors -->
+  <g class="pipe-base">
+    <path data-zone="1" d="M0 100L51.7094 130L51.7094 186.747L130.816 233.785L534 0" transform="translate(606 600)" />
+    <path data-zone="6" d="M0 380L143 466L553 230L156 0" transform="translate(1217 250)" />
+    <path data-zone="7" d="M0 322L119 389.406L453.729 194.542L119 0" transform="translate(1254 280)" />
+    <path data-zone="8" d="M0 80L66.0002 118.324L66.0002 317.111L614 0" transform="translate(560 620)" />
+    <path data-zone="9" d="M0 124.93L32.4639 143.732L32.4639 227.798L117.429 278.467L599.998 0" transform="translate(560 610)" />
+    <path data-zone="10" d="M0 82.5L83 130.326L83 175L150 215L519 0" transform="translate(606 592.5)" />
+  </g>
+
+  <!-- Animated Flow -->
+  <g class="pipe-flow">
+    <path data-zone="1" class="flow-backward" d="M0 100L51.7094 130L51.7094 186.747L130.816 233.785L534 0" transform="translate(606 600)" />
+    <path data-zone="6" class="flow-forward" d="M0 380L143 466L553 230L156 0" transform="translate(1217 250)" />
+    <path data-zone="7" class="flow-backward" d="M0 322L119 389.406L453.729 194.542L119 0" transform="translate(1254 280)" />
+    <path data-zone="8" class="flow-backward" d="M0 80L66.0002 118.324L66.0002 317.111L614 0" transform="translate(560 620)" />
+    <path data-zone="9" class="flow-backward" d="M0 124.93L32.4639 143.732L32.4639 227.798L117.429 278.467L599.998 0" transform="translate(560 610)" />
+    <path data-zone="10" class="flow-backward" d="M0 82.5L83 130.326L83 175L150 215L519 0" transform="translate(606 592.5)" />
+  </g>
+</g>
 <!-- SMALL FITTING DETAILS / ARROWS (Black Connectors) -->
 <g class="pipe-fittings">
   <path d="M10.2156 0L0 4.08618L0 22.4741L13.0758 14.3017" fill="none" stroke-width="6" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" transform="translate(1068 566)" />
@@ -2989,26 +2992,26 @@
   <g class="pipe-badges">
 
   <!-- CIRCUIT 1 -->
-  <g transform="translate(505, 690)">
-    <circle r="12" /> <!-- Increased radius from 10 to 14 to fit larger text -->
+  <g transform="translate(545, 690)">
+    <circle r="10" /> <!-- Increased radius from 10 to 14 to fit larger text -->
     <text y="4">1</text>
   </g>
 
   <!-- CIRCUIT 2 -->
-  <g transform="translate(505, 790)">
-    <circle r="12" />
+  <g transform="translate(545, 725)">
+    <circle r="10" />
     <text y="4">2</text>
   </g>
 
   <!-- CIRCUIT 3 -->
-  <g transform="translate(620, 730)">
-    <circle r="12" />
+  <g transform="translate(590, 700)">
+    <circle r="10" />
     <text y="4">3</text>
   </g>
 
   <!-- CIRCUIT 4 -->
-  <g transform="translate(585, 650)">
-    <circle r="12" />
+  <g transform="translate(590, 665)">
+    <circle r="10" />
     <text y="4">4</text>
   </g>
 
@@ -3019,6 +3022,7 @@
   </svg>
 
 <script>
+// Global State & Data Structures
 const zoneAnimations = {};
 const zoneFlowRates = { 
   1: 80, 2: 80, 3: 80, 4: 80, 5: 80, 
@@ -3029,66 +3033,35 @@ const zoneFlowRates = {
 const circuitPairs = {
   8: 2,  // Inj -> Mold #1 (Zone 8) <-> Mold -> Inj #1 (Zone 2)
   9: 5,  // Inj -> Mold #2 (Zone 9) <-> Mold -> Inj #2 (Zone 5)
-  1: 4,  // Inj -> Mold #3 (Zone 1) <-> Mold -> Inj #3 (Zone 4)
-  10: 3, // Inj -> Mold #4 (Zone 10) <-> Mold -> Inj #4 (Zone 3)
+  10: 4, // Inj -> Mold #3 (Zone 10) <-> Mold -> Inj #3 (Zone 4)
+  1: 3,  // Inj -> Mold #4 (Zone 1) <-> Mold -> Inj #4 (Zone 3)
   6: 7   // Main Supply Outlet (Zone 6) <-> Main Return Inlet (Zone 7)
 };
 
-// Thermal travel delay history buffers for each circuit
-const thermalHistoryBuffers = {
-  // Array to store past supply temperatures for each outlet zone
+// Mapping circuits (Pipes 1 to 4) to primary supply zones
+const valveZoneMap = {
+  1: 8,  // Pipe 1 -> Zone 8
+  2: 9,  // Pipe 2 -> Zone 9
+  3: 1,  // Pipe 3 -> Zone 1
+  4: 10  // Pipe 4 -> Zone 10
 };
+
+// Thermal travel delay history buffers for each circuit
+const thermalHistoryBuffers = {};
 
 // Maximum history buffer size (~60 frames = ~1 second delay at 60fps)
 const MAX_DELAY_FRAMES = 60;
+const MAX_RATED_FLOW = 80; // 80 L/min = 100% MV
 
-// Unified Flow Rate Function
-function setCircuitFlowRate(primaryZoneId, flowValue) {
-  const isFcActive = fcToggle ? fcToggle.checked : false;
-  const clampedFlow = Math.min(Math.max(flowValue || 0, 0), 80);
-const effectiveFlow = isFcActive ? clampedFlow : 80;
-  
-  const pairedZoneId = circuitPairs[primaryZoneId] || 
-                       Object.keys(circuitPairs).find(key => circuitPairs[key] == primaryZoneId);
-
-  const zonesToUpdate = [primaryZoneId];
-  if (pairedZoneId) zonesToUpdate.push(pairedZoneId);
-
-  zonesToUpdate.forEach(zId => {
-    zoneFlowRates[zId] = effectiveFlow;
-
-    const playbackSpeed = effectiveFlow > 0 ? 0.3 + (effectiveFlow / 80) * 2.7 : 0;
-
-    // Update animations
-    if (zoneAnimations[zId]) {
-      zoneAnimations[zId].forEach(anim => {
-        anim.playbackRate = playbackSpeed;
-        if (isRunning && effectiveFlow > 0) anim.play();
-        else anim.pause();
-      });
-    }
-
-    // FIX: Only hide the animated flow dashes when flow is 0, keep the base pipe visible!
-    const flowDashes = document.querySelectorAll(`.pipe-flow path[data-zone="${zId}"]`);
-    flowDashes.forEach(dashPath => {
-      dashPath.style.opacity = effectiveFlow === 0 ? '0' : '1';
-    });
-
-    // Make sure base pipes stay fully visible
-    const basePipes = document.querySelectorAll(`.pipe-base path[data-zone="${zId}"], .pipe-outline path[data-zone="${zId}"]`);
-    basePipes.forEach(pipePath => {
-      pipePath.style.opacity = '1';
-    });
-  });
-  updateValveVisuals();
-}
-
+// UI Elements
 const tempSlider = document.getElementById('tempSlider');
 const tempDisplay = document.getElementById('tempDisplay');
 const flowSlider = document.getElementById('flowSlider');
 const flowRateDisplay = document.getElementById('flowRate');
 const fcToggle = document.getElementById('fcToggle');
 const fcStatus = document.getElementById('fcStatus');
+const mvToggle = document.getElementById('mvToggle');
+const mvStatus = document.getElementById('mvStatus');
 const startBtn = document.getElementById('startBtn');
 const svg = document.getElementById('systemSvg');
 
@@ -3096,6 +3069,15 @@ let isRunning = false;
 let currentSupplyTemp = 20;
 const AMBIENT_TEMP = 20;
 const DECAY_RATE_BASE = 0.03;
+
+// State tracking variables
+let flowMode = 'infinite'; // 'infinite' or 'timed'
+let cycleTimeout = null;
+let countdownInterval = null;
+let isCycleActive = false;
+
+// Track previous MV state to trigger value scaling on mode toggle
+let wasMvActive = mvToggle ? mvToggle.checked : true;
 
 // Initialize SVG Web Animations
 function initFlowAnimations() {
@@ -3144,70 +3126,232 @@ function tempToColor(temp) {
   return `rgb(${red}, ${green}, ${blue})`;
 }
 
-// Update individual pipe zone flow rate and animation speed
-function setZoneFlowRate(zoneId, flowValue) {
+// Unified Flow Rate Function (Always expects volumetric L/min internally)
+function setCircuitFlowRate(primaryZoneId, flowValue) {
   const isFcActive = fcToggle ? fcToggle.checked : false;
-  const effectiveFlow = isFcActive ? flowValue : 100;
-  zoneFlowRates[zoneId] = effectiveFlow;
+  const isMvActive = mvToggle ? mvToggle.checked : true;
 
-  const playbackSpeed = effectiveFlow > 0 ? 0.3 + (effectiveFlow / 100) * 2.7 : 0;
+  const clampedFlow = Math.min(Math.max(flowValue || 0, 0), MAX_RATED_FLOW);
+  
+  // Base requested flow from FC
+  const requestedFlow = isFcActive ? clampedFlow : MAX_RATED_FLOW;
+  
+  // If MV is active, effective flow scales proportionally with valve position
+  // If MV is OFF, flow passes through without valve modulation constraints
+  const effectiveFlow = isMvActive ? requestedFlow : MAX_RATED_FLOW;
 
-  if (zoneAnimations[zoneId]) {
-    zoneAnimations[zoneId].forEach(anim => {
-      anim.playbackRate = playbackSpeed;
-      if (isRunning && effectiveFlow > 0) {
-        anim.play();
-      } else {
-        anim.pause();
-      }
+  const pairedZoneId = circuitPairs[primaryZoneId] || 
+                       Object.keys(circuitPairs).find(key => circuitPairs[key] == primaryZoneId);
+
+  const zonesToUpdate = [primaryZoneId];
+  if (pairedZoneId) zonesToUpdate.push(pairedZoneId);
+
+  zonesToUpdate.forEach(zId => {
+    zoneFlowRates[zId] = effectiveFlow;
+
+    const playbackSpeed = effectiveFlow > 0 ? 0.3 + (effectiveFlow / MAX_RATED_FLOW) * 2.7 : 0;
+
+    // Update animations
+    if (zoneAnimations[zId]) {
+      zoneAnimations[zId].forEach(anim => {
+        anim.playbackRate = playbackSpeed;
+        if (isRunning && effectiveFlow > 0) anim.play();
+        else anim.pause();
+      });
+    }
+
+    // Toggle flow dash opacity
+    const flowDashes = document.querySelectorAll(`.pipe-flow path[data-zone="${zId}"]`);
+    flowDashes.forEach(dashPath => {
+      dashPath.style.opacity = effectiveFlow === 0 ? '0' : '1';
     });
-  }
 
-  // Toggle opacity across all 3 layers for this zone
-  const paths = document.querySelectorAll(`path[data-zone="${zoneId}"]`);
-  paths.forEach(path => {
-    path.style.opacity = effectiveFlow === 0 ? '0' : '1';
+    // Keep base pipes visible
+    const basePipes = document.querySelectorAll(`.pipe-base path[data-zone="${zId}"], .pipe-outline path[data-zone="${zId}"]`);
+    basePipes.forEach(pipePath => {
+      pipePath.style.opacity = '1';
+    });
   });
+
+  updateValveVisuals();
 }
 
-// Sync UI states and pipe speeds
 function syncSystemState() {
   const isFcActive = fcToggle ? fcToggle.checked : false;
+  const isMvActive = mvToggle ? mvToggle.checked : true;
 
+  // 1. Update Table Column Header Text
+  const headerEl = document.getElementById('flow-column-header');
+  if (headerEl) {
+    headerEl.textContent = isMvActive ? 'MV (%)' : 'Flow (L/min)';
+  }
+
+  // Update FC and MV Status Indicators
   if (fcStatus) {
     fcStatus.textContent = isFcActive ? "ON (REGULATED)" : "OFF (MAX)";
     fcStatus.style.color = isFcActive ? "#00a887" : "#ff5252";
   }
 
+  if (mvStatus) {
+    mvStatus.textContent = isMvActive ? "ON (ACTIVE)" : "OFF (BYPASS)";
+    mvStatus.style.color = isMvActive ? "#00a887" : "#ff5252";
+  }
+
+  const modeToggled = (wasMvActive !== isMvActive);
+
+  // 2. Update Master Slider Range & Value
   if (flowSlider) {
     flowSlider.disabled = !isFcActive;
+    const maxMasterLimit = isMvActive ? 100 : MAX_RATED_FLOW;
+    flowSlider.setAttribute('max', maxMasterLimit);
+
+    let masterVal = parseFloat(flowSlider.value) || 0;
+
+    // Convert value on toggle (e.g., 40 L/min -> 50% or 50% -> 40 L/min)
+    if (modeToggled) {
+      if (isMvActive) {
+        masterVal = Math.round((masterVal / MAX_RATED_FLOW) * 100);
+      } else {
+        masterVal = Math.round((masterVal / 100) * MAX_RATED_FLOW);
+      }
+      flowSlider.value = masterVal;
+    }
+
+    // Update readout display next to slider
+    if (flowRateDisplay) {
+      flowRateDisplay.textContent = `${Math.round(masterVal)}${isMvActive ? '%' : ' L/min'}`;
+    }
   }
 
+  // 3. Update Individual Circuit Inputs
   document.querySelectorAll('.zone-flow-input').forEach(input => {
-  input.disabled = !isFcActive;
-  const zoneId = input.getAttribute('data-zone');
+    input.disabled = !isFcActive;
+    const zoneId = input.getAttribute('data-zone');
+    const maxLimit = isMvActive ? 100 : MAX_RATED_FLOW;
+    
+    input.setAttribute('max', maxLimit);
+
+    let val = parseFloat(input.value);
+    if (isNaN(val) || val < 0) val = 0;
+
+    // Convert value on toggle
+    if (modeToggled) {
+      if (isMvActive) {
+        val = Math.round((val / MAX_RATED_FLOW) * 100);
+      } else {
+        val = Math.round((val / 100) * MAX_RATED_FLOW);
+      }
+      input.value = val;
+    }
+
+    if (val > maxLimit) {
+      val = maxLimit;
+      input.value = maxLimit;
+    }
+
+    // Convert to L/min internally for physics and SVG rendering
+    const flowInLmin = isMvActive ? (val / 100) * MAX_RATED_FLOW : val;
+    const effectiveFlow = isFcActive ? flowInLmin : MAX_RATED_FLOW;
+
+    setCircuitFlowRate(zoneId, effectiveFlow);
+  });
+
+  wasMvActive = isMvActive;
+  updateValveVisuals();
+}
+
+function calculateStellgrad(flowLmin) {
+  if (flowLmin <= 0) return 0;
+  const pct = (flowLmin / MAX_RATED_FLOW) * 100;
+  return Math.min(100, Math.max(0, Math.round(pct)));
+}
+
+function updateValveVisuals() {
+  const isFcActive = fcToggle ? fcToggle.checked : false;
+  const isMvActive = mvToggle ? mvToggle.checked : true;
+
+  const masterFlowInput = flowSlider ? parseFloat(flowSlider.value) || 0 : MAX_RATED_FLOW;
+  const masterFlowInLmin = isMvActive ? (masterFlowInput / 100) * MAX_RATED_FLOW : masterFlowInput;
+
+  for (let i = 1; i <= 4; i++) {
+    const primaryZone = valveZoneMap[i];
+    
+    const rawFlow = zoneFlowRates[primaryZone] !== undefined ? zoneFlowRates[primaryZone] : MAX_RATED_FLOW;
+    
+    let requestedFlow = isFcActive ? rawFlow : masterFlowInLmin;
+    requestedFlow = Math.min(Math.max(requestedFlow, 0), MAX_RATED_FLOW);
+
+    const stellgradY = calculateStellgrad(requestedFlow);
+
+    // Target flow reflects active MV state
+    const targetFlow = isMvActive ? requestedFlow : MAX_RATED_FLOW;
   
-  // Read and clamp typed input between 0 and 80 L/min
-  let parsedVal = parseFloat(input.value);
-  if (isNaN(parsedVal) || parsedVal < 0) parsedVal = 0;
-  if (parsedVal > MAX_RATED_FLOW) {
-    parsedVal = MAX_RATED_FLOW;
-    input.value = MAX_RATED_FLOW; // Reset visual input field if user typed > 80
+    // 1. Update Flow Readout
+    const flowEl = document.getElementById(`flow-val-${i}`);
+    if (flowEl) flowEl.textContent = Math.round(targetFlow);
+
+    // 2. Update Pie Center Badge & MV Text
+    const badgeEl = document.getElementById(`valve-pct-${i}`);
+    if (badgeEl) badgeEl.textContent = isMvActive ? `${stellgradY}%` : '100%';
+
+    const mvPctEl = document.getElementById(`mv-pct-${i}`);
+    if (mvPctEl) mvPctEl.textContent = isMvActive ? `${stellgradY}%` : '100%';
+
+    // 3. Update MV Progress Bar Fill
+    const mvFillEl = document.getElementById(`mv-fill-${i}`);
+    if (mvFillEl) mvFillEl.style.width = isMvActive ? `${stellgradY}%` : '100%';
+
+    // 4. Update Live Formula Readout
+    const formulaEl = document.getElementById(`mv-formula-${i}`);
+    if (formulaEl) {
+      formulaEl.textContent = isMvActive
+        ? `Y = (${Math.round(targetFlow)} / ${MAX_RATED_FLOW} L/min) × 100 = ${stellgradY}%`
+        : `MV OFF — Direct Passthrough (${Math.round(targetFlow)} L/min, Valve 100% Open)`;
+    }
+
+    // 5. Update SVG Pie Slice Geometry & Color
+    const sliceEl = document.getElementById(`pie-slice-${i}`);
+    if (sliceEl) {
+      const renderPct = isMvActive ? stellgradY : 100;
+      sliceEl.setAttribute('d', getPiePath(renderPct));
+      sliceEl.style.fill = !isMvActive ? '#00a887' : (stellgradY === 0 ? '#ff4d4d' : '#00a887');
+    }
   }
 
-  // Use clamped input when FC is active; fallback to 80 (not 100) when FC is inactive
-  const flowVal = isFcActive ? parsedVal : MAX_RATED_FLOW;
-  
-  setZoneFlowRate(zoneId, flowVal);
-});
-} 
+  // Update Global Math Formula
+  const globalFormulaEl = document.getElementById('live-formula-math');
+  if (globalFormulaEl) {
+    const activeDisplayFlow = isFcActive 
+      ? (zoneFlowRates[valveZoneMap[1]] !== undefined ? zoneFlowRates[valveZoneMap[1]] : MAX_RATED_FLOW)
+      : masterFlowInLmin;
+    const clampedFlow = Math.min(Math.max(activeDisplayFlow, 0), MAX_RATED_FLOW);
+
+    if (isMvActive) {
+      const overallMV = calculateStellgrad(clampedFlow);
+      globalFormulaEl.textContent = `Y = (${Math.round(clampedFlow)} L/min ÷ ${MAX_RATED_FLOW} L/min) × 100 = ${overallMV}%`;
+    } else {
+      globalFormulaEl.textContent = `MV OFF — Direct Passthrough (${Math.round(clampedFlow)} L/min, Valve 100% Open)`;
+    }
+  }
+}
+
+// Generates SVG path string for pie slice based on percentage
+function getPiePath(pct) {
+  if (pct >= 100) return "M 0 -1 A 1 1 0 1 1 -0.0001 -1 Z";
+  if (pct <= 0) return "M 0 0 L 0 -1 Z";
+
+  const rad = (pct / 100) * 2 * Math.PI;
+  const x = Math.sin(rad);
+  const y = -Math.cos(rad);
+  const largeArc = pct > 50 ? 1 : 0;
+
+  return `M 0 0 L 0 -1 A 1 1 0 ${largeArc} 1 ${x.toFixed(4)} ${y.toFixed(4)} Z`;
+}
 
 function updatePhysics() {
   const targetSetTemp = tempSlider ? parseFloat(tempSlider.value) : 20;
   const isFcActive = fcToggle ? fcToggle.checked : false;
 
-  // 1. Primary TCU Heating Element Transition:
-  // When isRunning is false (e.g. cycle ended), currentSupplyTemp decays back to AMBIENT_TEMP
   if (isRunning) {
     currentSupplyTemp += (targetSetTemp - currentSupplyTemp) * DECAY_RATE_BASE;
   } else {
@@ -3221,34 +3365,26 @@ function updatePhysics() {
   let totalReturnThermalMass = 0;
   let totalFlowRate = 0;
 
-  // 2. Circuit Processing (Explicit Supply vs Return Mapping)
   Object.entries(circuitPairs).forEach(([supplyZone, returnZone]) => {
-    // Get flow rate for this circuit pair
-    const currentFlow = isFcActive ? (zoneFlowRates[supplyZone] || 0) : 100;
+    const currentFlow = isFcActive ? (zoneFlowRates[supplyZone] || 0) : MAX_RATED_FLOW;
     
-    // Initialize delay array for the return zone
     if (!thermalHistoryBuffers[returnZone]) {
       thermalHistoryBuffers[returnZone] = new Array(MAX_DELAY_FRAMES).fill(AMBIENT_TEMP);
     }
 
     if (currentFlow > 0) {
-      // Record current supply temperature into history queue
       thermalHistoryBuffers[returnZone].unshift(currentSupplyTemp);
       if (thermalHistoryBuffers[returnZone].length > MAX_DELAY_FRAMES) {
         thermalHistoryBuffers[returnZone].pop();
       }
 
-      // Calculate transport delay frame index based on flow rate
       const delayIndex = Math.min(
         MAX_DELAY_FRAMES - 1,
-        Math.floor((1 - currentFlow / 100) * (MAX_DELAY_FRAMES - 12) + 12)
+        Math.floor((1 - currentFlow / MAX_RATED_FLOW) * (MAX_DELAY_FRAMES - 12) + 12)
       );
 
-      // Delayed fluid temperature arriving at the return side
       const delayedSupplyTemp = thermalHistoryBuffers[returnZone][delayIndex] || currentSupplyTemp;
-
-      // Newton's Law of Cooling applied to the delayed fluid
-      const dwellTimeFactor = 1 / (currentFlow / 100); 
+      const dwellTimeFactor = 1 / (currentFlow / MAX_RATED_FLOW); 
       const thermalLossCoeff = 0.35; 
       
       const temperatureDifference = delayedSupplyTemp - AMBIENT_TEMP;
@@ -3258,35 +3394,29 @@ function updatePhysics() {
       );
       const returnTemp = delayedSupplyTemp - heatLoss;
 
-      // --- INJECTION TO MOLD (Supply Pipes: Hot / Immediate) ---
       const supplyPipes = document.querySelectorAll(`.pipe-base path[data-zone="${supplyZone}"]`);
       supplyPipes.forEach(pipe => {
         pipe.style.stroke = tempToColor(currentSupplyTemp);
       });
 
-      // --- MOLD TO INJECTION (Return Pipes: Cooled / Delayed) ---
       const returnPipes = document.querySelectorAll(`.pipe-base path[data-zone="${returnZone}"]`);
       returnPipes.forEach(pipe => {
         pipe.style.stroke = tempToColor(returnTemp);
       });
 
-      // Track mass balance for total return flow calculation
       totalReturnThermalMass += returnTemp * currentFlow;
       totalFlowRate += currentFlow;
     }
   });
 
-  // 3. Main Feed / Main Return Loop
   if (totalFlowRate > 0) {
     const avgReturnTemp = totalReturnThermalMass / totalFlowRate;
 
-    // Main Supply Feed (Zone 6): Hot fluid going out
     const mainSupplyPipe = document.querySelector(`.pipe-base path[data-zone="7"]`);
     if (mainSupplyPipe) {
       mainSupplyPipe.style.stroke = tempToColor(currentSupplyTemp);
     }
 
-    // Main Return Loop (Zone 7): Cooled fluid coming back
     const mainReturnPipe = document.querySelector(`.pipe-base path[data-zone="6"]`);
     if (mainReturnPipe) {
       mainReturnPipe.style.stroke = tempToColor(avgReturnTemp);
@@ -3297,51 +3427,61 @@ function updatePhysics() {
   requestAnimationFrame(updatePhysics);
 }
 
-// Table Input Event Listener
-// Table Input Event Listener (Realtime Sync & Cap)
+// Global Event Listeners for Dynamic Input Limits
 document.addEventListener('input', (event) => {
-  // Target your zone flow inputs or master slider
-  if (event.target.classList.contains('zone-flow-input') || event.target.id === 'flowSlider') {
-    const MAX = 80;
+  if (event.target.classList.contains('zone-flow-input')) {
+    const isMvActive = mvToggle ? mvToggle.checked : true;
+    const maxLimit = isMvActive ? 100 : MAX_RATED_FLOW;
+
     let val = parseFloat(event.target.value);
 
-    // Hard clamp values above 80 or below 0
-    if (val > MAX) {
-      event.target.value = MAX;
-      val = MAX;
+    if (val > maxLimit) {
+      event.target.value = maxLimit;
+      val = maxLimit;
     } else if (val < 0 || isNaN(val)) {
       val = 0;
     }
 
-    // REALTIME FIX: Update zone data and trigger valve overlay refreshes immediately!
-    if (event.target.classList.contains('zone-flow-input')) {
-      const primaryZoneId = event.target.getAttribute('data-zone');
-      if (primaryZoneId) {
-        // Update circuit flow and sync paired supply/return zones
-        setCircuitFlowRate(primaryZoneId, val);
-      }
+    const primaryZoneId = event.target.getAttribute('data-zone');
+    if (primaryZoneId) {
+      const flowInLmin = isMvActive ? (val / 100) * MAX_RATED_FLOW : val;
+      setCircuitFlowRate(primaryZoneId, flowInLmin);
     }
-
-    // Force an immediate UI redraw across all valve overlays
     updateValveVisuals();
   }
 });
 
-// Control Listeners
 if (fcToggle) {
   fcToggle.addEventListener('change', syncSystemState);
 }
 
+if (mvToggle) {
+  mvToggle.addEventListener('change', syncSystemState);
+}
+
 if (flowSlider) {
   flowSlider.addEventListener('input', (e) => {
+    const isMvActive = mvToggle ? mvToggle.checked : true;
+    const isFcActive = fcToggle ? fcToggle.checked : false;
     const masterVal = parseFloat(e.target.value) || 0;
-    if (flowRateDisplay) flowRateDisplay.textContent = Math.round(masterVal);
     
+    // Update live text next to slider with dynamic units
+    if (flowRateDisplay) {
+      flowRateDisplay.textContent = `${Math.round(masterVal)}${isMvActive ? '%' : ' L/min'}`;
+    }
+    
+    // Sync all circuit table inputs to match the master slider
     document.querySelectorAll('.zone-flow-input').forEach(input => {
       input.value = masterVal;
       const primaryZoneId = input.getAttribute('data-zone');
-      setCircuitFlowRate(primaryZoneId, masterVal);
+      
+      const flowInLmin = isMvActive ? (masterVal / 100) * MAX_RATED_FLOW : masterVal;
+      const effectiveFlow = isFcActive ? flowInLmin : MAX_RATED_FLOW;
+
+      setCircuitFlowRate(primaryZoneId, effectiveFlow);
     });
+
+    updateValveVisuals();
   });
 }
 
@@ -3354,6 +3494,19 @@ if (tempSlider) {
 if (startBtn) {
   startBtn.addEventListener('click', () => {
     isRunning = !isRunning;
+
+    // Reset timed cycle timeouts if manually stopped
+    if (!isRunning && cycleTimeout) {
+      clearTimeout(cycleTimeout);
+      if (countdownInterval) clearInterval(countdownInterval);
+      isCycleActive = false;
+      const startCycleBtn = document.getElementById('start-cycle-btn');
+      if (startCycleBtn) {
+        startCycleBtn.disabled = false;
+        startCycleBtn.textContent = 'START CYCLE';
+      }
+    }
+
     startBtn.textContent = isRunning ? 'STOP' : 'START';
     startBtn.classList.toggle('running', isRunning);
     if (svg) svg.classList.toggle('running', isRunning);
@@ -3365,177 +3518,62 @@ if (startBtn) {
   });
 }
 
-
-// Mapping circuits (Pipes 1 to 4) to primary supply zones
-const valveZoneMap = {
-  1: 8,  // Pipe 1 -> Zone 8
-  2: 9,  // Pipe 2 -> Zone 9
-  3: 1,  // Pipe 3 -> Zone 1
-  4: 10  // Pipe 4 -> Zone 10
-};
-
-// State tracking variables
-let flowMode = 'infinite'; // 'infinite' or 'timed'
-let cycleTimeout = null;
-let isCycleActive = false;
-
-// Handle Mode Toggle Switch
+// Mode handlers
 function handleModeChange(mode) {
   flowMode = mode;
   const timedControls = document.getElementById('timed-controls');
 
   if (mode === 'timed') {
-    timedControls.style.display = 'flex';
-    isRunning = false; // Stop active flow when switching modes
+    if (timedControls) timedControls.style.display = 'flex';
+    isRunning = false;
   } else {
-    timedControls.style.display = 'none';
+    if (timedControls) timedControls.style.display = 'none';
     if (cycleTimeout) clearTimeout(cycleTimeout);
-    isRunning = true; // Auto-resume in continuous mode
+    if (countdownInterval) clearInterval(countdownInterval);
+    isRunning = true;
   }
 }
 
-// Start Timed Cycle Function
 function startTimedCycle() {
   if (flowMode !== 'timed') return;
 
   const durationInput = document.getElementById('timer-duration');
   const durationSec = durationInput ? parseFloat(durationInput.value) || 15 : 15;
-  const startBtn = document.getElementById('start-cycle-btn');
+  const startCycleBtn = document.getElementById('start-cycle-btn');
 
-  // Clear existing timer if active
   if (cycleTimeout) clearTimeout(cycleTimeout);
+  if (countdownInterval) clearInterval(countdownInterval);
 
-  // Activate flow state
   isRunning = true;
   isCycleActive = true;
   
-  if (startBtn) {
-    startBtn.disabled = true;
-    startBtn.textContent = `RUNNING (${durationSec}s)...`;
+  if (startCycleBtn) {
+    startCycleBtn.disabled = true;
+    startCycleBtn.textContent = `RUNNING (${durationSec}s)...`;
   }
 
-  // Count down and auto-stop after duration
   let remainingTime = durationSec;
-  const countdownInterval = setInterval(() => {
+  countdownInterval = setInterval(() => {
     remainingTime--;
-    if (startBtn && remainingTime > 0) {
-      startBtn.textContent = `RUNNING (${remainingTime}s)...`;
+    if (startCycleBtn && remainingTime > 0) {
+      startCycleBtn.textContent = `RUNNING (${remainingTime}s)...`;
     }
   }, 1000);
 
   cycleTimeout = setTimeout(() => {
     clearInterval(countdownInterval);
-    isRunning = false; // Stops heat supply -> triggers cooling to ambient
+    isRunning = false;
     isCycleActive = false;
 
-    if (startBtn) {
-      startBtn.disabled = false;
-      startBtn.textContent = 'START CYCLE';
+    if (startCycleBtn) {
+      startCycleBtn.disabled = false;
+      startCycleBtn.textContent = 'START CYCLE';
     }
   }, durationSec * 1000);
 }
 
-const MAX_RATED_FLOW = 80; // 100 L/min = 100% MV
-
-function calculateStellgrad(flowLmin) {
-  if (flowLmin <= 0) return 0;
-  // Linear scaling: MV % = (Flow / Max Flow) * 100
-  const pct = (flowLmin / MAX_RATED_FLOW) * 100;
-  return Math.min(100, Math.max(0, Math.round(pct)));
-}
-
-function updateValveVisuals() {
-  const fcToggleEl = document.getElementById('fcToggle');
-  const flowSliderEl = document.getElementById('flowSlider'); // Master Flow Slider
-  const isFcActive = fcToggleEl ? fcToggleEl.checked : false;
-
-  // Maximum rated capacity for the system
-  const MAX_RATED_FLOW = 80;
-
-  // Read value from master slider if FC is inactive, default to 80
-  const masterFlow = flowSliderEl ? parseFloat(flowSliderEl.value) || MAX_RATED_FLOW : MAX_RATED_FLOW;
-
-  for (let i = 1; i <= 4; i++) {
-    const primaryZone = valveZoneMap[i];
-    
-    // Read raw flow from zone map, or fallback to MAX_RATED_FLOW
-    const rawFlow = zoneFlowRates[primaryZone] !== undefined ? zoneFlowRates[primaryZone] : MAX_RATED_FLOW;
-    
-    // IF FC active -> Use individual zone flow
-    // IF FC inactive -> Use Master Slider flow (instead of hardcoded 100)
-    let targetFlow = isFcActive ? rawFlow : masterFlow;
-
-    // Clamp value between 0 and 80 L/min
-    targetFlow = Math.min(Math.max(targetFlow, 0), MAX_RATED_FLOW);
-
-    // Calculate Manipulated Variable % (Stellgrad Y) based on 80 L/min max capacity
-    const stellgradY = Math.round((targetFlow / MAX_RATED_FLOW) * 100);
-
-    // 1. Update Flow Readout
-    const flowEl = document.getElementById(`flow-val-${i}`);
-    if (flowEl) flowEl.textContent = Math.round(targetFlow);
-
-    // 2. Update Pie Center Badge & MV Text
-    const badgeEl = document.getElementById(`valve-pct-${i}`);
-    if (badgeEl) badgeEl.textContent = `${stellgradY}%`;
-
-    const mvPctEl = document.getElementById(`mv-pct-${i}`);
-    if (mvPctEl) mvPctEl.textContent = `${stellgradY}%`;
-
-    // 3. Update MV Progress Bar Fill
-    const mvFillEl = document.getElementById(`mv-fill-${i}`);
-    if (mvFillEl) mvFillEl.style.width = `${stellgradY}%`;
-
-    // 4. Update Live Formula Readout under each bar
-    const formulaEl = document.getElementById(`mv-formula-${i}`);
-    if (formulaEl) {
-      formulaEl.textContent = `Y = ${Math.round(targetFlow)}/${MAX_RATED_FLOW} × 100 = ${stellgradY}%`;
-    }
-
-    // 5. Update SVG Pie Slice Geometry & Color
-    const sliceEl = document.getElementById(`pie-slice-${i}`);
-    if (sliceEl) {
-      sliceEl.setAttribute('d', getPiePath(stellgradY));
-      sliceEl.style.fill = stellgradY === 0 ? '#ff4d4d' : '#00a887';
-    }
-  }
-
-  // Optional: Update a main global formula panel if present in your HTML
-  const globalFormulaEl = document.getElementById('live-formula-math');
-  if (globalFormulaEl) {
-    const activeDisplayFlow = isFcActive 
-      ? (zoneFlowRates[valveZoneMap[1]] !== undefined ? zoneFlowRates[valveZoneMap[1]] : MAX_RATED_FLOW)
-      : masterFlow;
-    const clampedFlow = Math.min(Math.max(activeDisplayFlow, 0), MAX_RATED_FLOW);
-    const overallMV = Math.round((clampedFlow / MAX_RATED_FLOW) * 100);
-    
-    globalFormulaEl.textContent = `Y = (${Math.round(clampedFlow)} L/min ÷ ${MAX_RATED_FLOW} L/min) × 100 = ${overallMV}%`;
-  }
-}
-
-// Generates SVG path string for pie slice based on percentage
-function getPiePath(pct) {
-  // 100% -> Full Circle
-  if (pct >= 100) return "M 0 -1 A 1 1 0 1 1 -0.0001 -1 Z";
-  
-  // 0% -> Empty
-  if (pct <= 0) return "M 0 0 L 0 -1 Z";
-
-  // Calculate arc angle in radians
-  const rad = (pct / 100) * 2 * Math.PI;
-  const x = Math.sin(rad);
-  const y = -Math.cos(rad);
-  const largeArc = pct > 50 ? 1 : 0;
-
-  // Draws: Center (0,0) -> Top (0,-1) -> Arc to (x,y) -> Close back to Center (0,0)
-  return `M 0 0 L 0 -1 A 1 1 0 ${largeArc} 1 ${x.toFixed(4)} ${y.toFixed(4)} Z`;
-}
-
-
-// Initialization
+// Initial System Execution
 initFlowAnimations();
 syncSystemState();
 updatePhysics();
-
-
 </script>
