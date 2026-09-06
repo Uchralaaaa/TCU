@@ -3023,6 +3023,7 @@
 
 <script>
 // Global State & Data Structures
+// Global State & Data Structures
 const zoneAnimations = {};
 const zoneFlowRates = { 
   1: 80, 2: 80, 3: 80, 4: 80, 5: 80, 
@@ -3049,7 +3050,7 @@ const valveZoneMap = {
 // Thermal travel delay history buffers for each circuit
 const thermalHistoryBuffers = {};
 
-// Maximum history buffer size (~60 frames = ~1 second delay at 60fps)
+// Maximum history buffer size
 const MAX_DELAY_FRAMES = 60;
 const MAX_RATED_FLOW = 80; // 80 L/min = 100% MV
 
@@ -3071,7 +3072,7 @@ const AMBIENT_TEMP = 20;
 const DECAY_RATE_BASE = 0.03;
 
 // State tracking variables
-let flowMode = 'infinite'; // 'infinite' or 'timed'
+let flowMode = 'infinite'; 
 let cycleTimeout = null;
 let countdownInterval = null;
 let isCycleActive = false;
@@ -3087,7 +3088,6 @@ function initFlowAnimations() {
     const zoneId = path.getAttribute('data-zone');
     const isBackward = path.classList.contains('flow-backward');
 
-    // Smooth dash animation offsets
     let startOffset = 0;
     let endOffset = isBackward ? 20 : -20;
 
@@ -3126,19 +3126,11 @@ function tempToColor(temp) {
   return `rgb(${red}, ${green}, ${blue})`;
 }
 
-// Unified Flow Rate Function (Always expects volumetric L/min internally)
-function setCircuitFlowRate(primaryZoneId, flowValue) {
-  const isFcActive = fcToggle ? fcToggle.checked : false;
-  const isMvActive = mvToggle ? mvToggle.checked : true;
-
-  const clampedFlow = Math.min(Math.max(flowValue || 0, 0), MAX_RATED_FLOW);
-  
-  // Base requested flow from FC
-  const requestedFlow = isFcActive ? clampedFlow : MAX_RATED_FLOW;
-  
-  // If MV is active, effective flow scales proportionally with valve position
-  // If MV is OFF, flow passes through without valve modulation constraints
-  const effectiveFlow = isMvActive ? requestedFlow : MAX_RATED_FLOW;
+// Sets flow rate (Always accepts physical L/min value internally)
+// Fixed: Pipe speed now updates dynamically for ALL input values in L/min or %
+function setCircuitFlowRate(primaryZoneId, flowValueInLmin) {
+  // Clamp input directly to 0-80 L/min range
+  const effectiveFlow = Math.min(Math.max(flowValueInLmin || 0, 0), MAX_RATED_FLOW);
 
   const pairedZoneId = circuitPairs[primaryZoneId] || 
                        Object.keys(circuitPairs).find(key => circuitPairs[key] == primaryZoneId);
@@ -3149,9 +3141,9 @@ function setCircuitFlowRate(primaryZoneId, flowValue) {
   zonesToUpdate.forEach(zId => {
     zoneFlowRates[zId] = effectiveFlow;
 
-    const playbackSpeed = effectiveFlow > 0 ? 0.3 + (effectiveFlow / MAX_RATED_FLOW) * 2.7 : 0;
+    // Calculate playback speed based directly on input flow rate (0 to 80 L/min)
+    const playbackSpeed = effectiveFlow > 0 ? 0.2 + (effectiveFlow / MAX_RATED_FLOW) * 2.8 : 0;
 
-    // Update animations
     if (zoneAnimations[zId]) {
       zoneAnimations[zId].forEach(anim => {
         anim.playbackRate = playbackSpeed;
@@ -3160,13 +3152,12 @@ function setCircuitFlowRate(primaryZoneId, flowValue) {
       });
     }
 
-    // Toggle flow dash opacity
+    // Hide dashes when flow is 0
     const flowDashes = document.querySelectorAll(`.pipe-flow path[data-zone="${zId}"]`);
     flowDashes.forEach(dashPath => {
       dashPath.style.opacity = effectiveFlow === 0 ? '0' : '1';
     });
 
-    // Keep base pipes visible
     const basePipes = document.querySelectorAll(`.pipe-base path[data-zone="${zId}"], .pipe-outline path[data-zone="${zId}"]`);
     basePipes.forEach(pipePath => {
       pipePath.style.opacity = '1';
@@ -3180,13 +3171,13 @@ function syncSystemState() {
   const isFcActive = fcToggle ? fcToggle.checked : false;
   const isMvActive = mvToggle ? mvToggle.checked : true;
 
-  // 1. Update Table Column Header Text
+  // Header update
   const headerEl = document.getElementById('flow-column-header');
   if (headerEl) {
     headerEl.textContent = isMvActive ? 'MV (%)' : 'Flow (L/min)';
   }
 
-  // Update FC and MV Status Indicators
+  // FC / MV status text
   if (fcStatus) {
     fcStatus.textContent = isFcActive ? "ON (REGULATED)" : "OFF (MAX)";
     fcStatus.style.color = isFcActive ? "#00a887" : "#ff5252";
@@ -3199,7 +3190,7 @@ function syncSystemState() {
 
   const modeToggled = (wasMvActive !== isMvActive);
 
-  // 2. Update Master Slider Range & Value
+  // Master slider sync
   if (flowSlider) {
     flowSlider.disabled = !isFcActive;
     const maxMasterLimit = isMvActive ? 100 : MAX_RATED_FLOW;
@@ -3207,7 +3198,6 @@ function syncSystemState() {
 
     let masterVal = parseFloat(flowSlider.value) || 0;
 
-    // Convert value on toggle (e.g., 40 L/min -> 50% or 50% -> 40 L/min)
     if (modeToggled) {
       if (isMvActive) {
         masterVal = Math.round((masterVal / MAX_RATED_FLOW) * 100);
@@ -3217,13 +3207,12 @@ function syncSystemState() {
       flowSlider.value = masterVal;
     }
 
-    // Update readout display next to slider
     if (flowRateDisplay) {
       flowRateDisplay.textContent = `${Math.round(masterVal)}${isMvActive ? '%' : ' L/min'}`;
     }
   }
 
-  // 3. Update Individual Circuit Inputs
+  // Circuit inputs sync
   document.querySelectorAll('.zone-flow-input').forEach(input => {
     input.disabled = !isFcActive;
     const zoneId = input.getAttribute('data-zone');
@@ -3234,7 +3223,6 @@ function syncSystemState() {
     let val = parseFloat(input.value);
     if (isNaN(val) || val < 0) val = 0;
 
-    // Convert value on toggle
     if (modeToggled) {
       if (isMvActive) {
         val = Math.round((val / MAX_RATED_FLOW) * 100);
@@ -3249,11 +3237,8 @@ function syncSystemState() {
       input.value = maxLimit;
     }
 
-    // Convert to L/min internally for physics and SVG rendering
     const flowInLmin = isMvActive ? (val / 100) * MAX_RATED_FLOW : val;
-    const effectiveFlow = isFcActive ? flowInLmin : MAX_RATED_FLOW;
-
-    setCircuitFlowRate(zoneId, effectiveFlow);
+    setCircuitFlowRate(zoneId, flowInLmin);
   });
 
   wasMvActive = isMvActive;
@@ -3283,25 +3268,20 @@ function updateValveVisuals() {
 
     const stellgradY = calculateStellgrad(requestedFlow);
 
-    // Target flow reflects active MV state
-    const targetFlow = isMvActive ? requestedFlow : MAX_RATED_FLOW;
+    const targetFlow =  requestedFlow;
   
-    // 1. Update Flow Readout
     const flowEl = document.getElementById(`flow-val-${i}`);
     if (flowEl) flowEl.textContent = Math.round(targetFlow);
 
-    // 2. Update Pie Center Badge & MV Text
     const badgeEl = document.getElementById(`valve-pct-${i}`);
     if (badgeEl) badgeEl.textContent = isMvActive ? `${stellgradY}%` : '100%';
 
     const mvPctEl = document.getElementById(`mv-pct-${i}`);
     if (mvPctEl) mvPctEl.textContent = isMvActive ? `${stellgradY}%` : '100%';
 
-    // 3. Update MV Progress Bar Fill
     const mvFillEl = document.getElementById(`mv-fill-${i}`);
     if (mvFillEl) mvFillEl.style.width = isMvActive ? `${stellgradY}%` : '100%';
 
-    // 4. Update Live Formula Readout
     const formulaEl = document.getElementById(`mv-formula-${i}`);
     if (formulaEl) {
       formulaEl.textContent = isMvActive
@@ -3309,7 +3289,6 @@ function updateValveVisuals() {
         : `MV OFF — Direct Passthrough (${Math.round(targetFlow)} L/min, Valve 100% Open)`;
     }
 
-    // 5. Update SVG Pie Slice Geometry & Color
     const sliceEl = document.getElementById(`pie-slice-${i}`);
     if (sliceEl) {
       const renderPct = isMvActive ? stellgradY : 100;
@@ -3318,7 +3297,6 @@ function updateValveVisuals() {
     }
   }
 
-  // Update Global Math Formula
   const globalFormulaEl = document.getElementById('live-formula-math');
   if (globalFormulaEl) {
     const activeDisplayFlow = isFcActive 
@@ -3335,7 +3313,6 @@ function updateValveVisuals() {
   }
 }
 
-// Generates SVG path string for pie slice based on percentage
 function getPiePath(pct) {
   if (pct >= 100) return "M 0 -1 A 1 1 0 1 1 -0.0001 -1 Z";
   if (pct <= 0) return "M 0 0 L 0 -1 Z";
@@ -3427,7 +3404,7 @@ function updatePhysics() {
   requestAnimationFrame(updatePhysics);
 }
 
-// Global Event Listeners for Dynamic Input Limits
+// Global Event Listeners
 document.addEventListener('input', (event) => {
   if (event.target.classList.contains('zone-flow-input')) {
     const isMvActive = mvToggle ? mvToggle.checked : true;
@@ -3465,12 +3442,10 @@ if (flowSlider) {
     const isFcActive = fcToggle ? fcToggle.checked : false;
     const masterVal = parseFloat(e.target.value) || 0;
     
-    // Update live text next to slider with dynamic units
     if (flowRateDisplay) {
       flowRateDisplay.textContent = `${Math.round(masterVal)}${isMvActive ? '%' : ' L/min'}`;
     }
     
-    // Sync all circuit table inputs to match the master slider
     document.querySelectorAll('.zone-flow-input').forEach(input => {
       input.value = masterVal;
       const primaryZoneId = input.getAttribute('data-zone');
@@ -3495,7 +3470,6 @@ if (startBtn) {
   startBtn.addEventListener('click', () => {
     isRunning = !isRunning;
 
-    // Reset timed cycle timeouts if manually stopped
     if (!isRunning && cycleTimeout) {
       clearTimeout(cycleTimeout);
       if (countdownInterval) clearInterval(countdownInterval);
@@ -3516,60 +3490,6 @@ if (startBtn) {
       else anim.pause();
     });
   });
-}
-
-// Mode handlers
-function handleModeChange(mode) {
-  flowMode = mode;
-  const timedControls = document.getElementById('timed-controls');
-
-  if (mode === 'timed') {
-    if (timedControls) timedControls.style.display = 'flex';
-    isRunning = false;
-  } else {
-    if (timedControls) timedControls.style.display = 'none';
-    if (cycleTimeout) clearTimeout(cycleTimeout);
-    if (countdownInterval) clearInterval(countdownInterval);
-    isRunning = true;
-  }
-}
-
-function startTimedCycle() {
-  if (flowMode !== 'timed') return;
-
-  const durationInput = document.getElementById('timer-duration');
-  const durationSec = durationInput ? parseFloat(durationInput.value) || 15 : 15;
-  const startCycleBtn = document.getElementById('start-cycle-btn');
-
-  if (cycleTimeout) clearTimeout(cycleTimeout);
-  if (countdownInterval) clearInterval(countdownInterval);
-
-  isRunning = true;
-  isCycleActive = true;
-  
-  if (startCycleBtn) {
-    startCycleBtn.disabled = true;
-    startCycleBtn.textContent = `RUNNING (${durationSec}s)...`;
-  }
-
-  let remainingTime = durationSec;
-  countdownInterval = setInterval(() => {
-    remainingTime--;
-    if (startCycleBtn && remainingTime > 0) {
-      startCycleBtn.textContent = `RUNNING (${remainingTime}s)...`;
-    }
-  }, 1000);
-
-  cycleTimeout = setTimeout(() => {
-    clearInterval(countdownInterval);
-    isRunning = false;
-    isCycleActive = false;
-
-    if (startCycleBtn) {
-      startCycleBtn.disabled = false;
-      startCycleBtn.textContent = 'START CYCLE';
-    }
-  }, durationSec * 1000);
 }
 
 // Initial System Execution
