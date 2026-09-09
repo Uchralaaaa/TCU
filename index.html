@@ -610,7 +610,7 @@
 <!-- Manipulated Variable (MV) Toggle -->
 <div class="control-group">
   <div class="toggle-row">
-    <label>Manipulated Variable (MV)</label>
+    <label>Advanced Control</label>
     <label class="switch">
       <input type="checkbox" id="mvToggle" checked> <!-- Add 'checked' if default is ON -->
       <span class="slider"></span>
@@ -618,13 +618,13 @@
   </div>
 </div>
 
-  <div class="control-group">
+  <!-- <div class="control-group">
     <label for="flowSlider">Manual Flow Rate</label>
     <div class="value-row">
       <input type="range" id="flowSlider" min="0" max="80" value="80" />
       <span class="unit-display"><span id="flowRate">80</span>
     </div>
-  </div>
+  </div> -->
 
 
 
@@ -639,7 +639,7 @@
 <!-- BOTTOM RIGHT VALVE & MV STATUS OVERLAY -->
 
 <div class="formula-card">
-  <div class="formula-header">MV Calculation</div>
+  <div class="formula-header">Calculation</div>
   
   <div class="formula-math">
     MV(%) = (Target Flow Rate / Maximum Capacity) * 100
@@ -3050,9 +3050,10 @@ const valveZoneMap = {
 // Thermal travel delay history buffers for each circuit
 const thermalHistoryBuffers = {};
 
-// Maximum history buffer size
+// Maximum history buffer size and Pump Flow Limits
 const MAX_DELAY_FRAMES = 60;
-const MAX_RATED_FLOW = 80; // 80 L/min = 100% MV
+const MAX_RATED_FLOW = 100;  // Maximum flow per individual channel (80 L/min)
+const PUMP_MAX_FLOW = 100;  // Maximum capacity limit of the pump (100 L/min)
 
 // UI Elements
 const tempSlider = document.getElementById('tempSlider');
@@ -3061,7 +3062,7 @@ const flowSlider = document.getElementById('flowSlider');
 const flowRateDisplay = document.getElementById('flowRate');
 const fcToggle = document.getElementById('fcToggle');
 const fcStatus = document.getElementById('fcStatus');
-const mvToggle = document.getElementById('mvToggle');
+const mvToggle = document.getElementById('mvToggle'); // Advanced Control Toggle
 const mvStatus = document.getElementById('mvStatus');
 const startBtn = document.getElementById('startBtn');
 const svg = document.getElementById('systemSvg');
@@ -3076,9 +3077,6 @@ let flowMode = 'infinite';
 let cycleTimeout = null;
 let countdownInterval = null;
 let isCycleActive = false;
-
-// Track previous MV state to trigger value scaling on mode toggle
-let wasMvActive = mvToggle ? mvToggle.checked : true;
 
 // Initialize SVG Web Animations
 function initFlowAnimations() {
@@ -3126,10 +3124,21 @@ function tempToColor(temp) {
   return `rgb(${red}, ${green}, ${blue})`;
 }
 
+// Robust SVG Pie Path Generator (0% to 100%)
+function getPiePath(pct) {
+  if (pct <= 0) return "M 0 0 L 0 -1 Z";
+  if (pct >= 100) return "M 0 -1 A 1 1 0 1 1 0 1 A 1 1 0 1 1 0 -1 Z";
+
+  const rad = (pct / 100) * 2 * Math.PI;
+  const x = Math.sin(rad);
+  const y = -Math.cos(rad);
+  const largeArc = pct > 50 ? 1 : 0;
+
+  return `M 0 0 L 0 -1 A 1 1 0 ${largeArc} 1 ${x.toFixed(4)} ${y.toFixed(4)} Z`;
+}
+
 // Sets flow rate (Always accepts physical L/min value internally)
-// Fixed: Pipe speed now updates dynamically for ALL input values in L/min or %
 function setCircuitFlowRate(primaryZoneId, flowValueInLmin) {
-  // Clamp input directly to 0-80 L/min range
   const effectiveFlow = Math.min(Math.max(flowValueInLmin || 0, 0), MAX_RATED_FLOW);
 
   const pairedZoneId = circuitPairs[primaryZoneId] || 
@@ -3141,7 +3150,6 @@ function setCircuitFlowRate(primaryZoneId, flowValueInLmin) {
   zonesToUpdate.forEach(zId => {
     zoneFlowRates[zId] = effectiveFlow;
 
-    // Calculate playback speed based directly on input flow rate (0 to 80 L/min)
     const playbackSpeed = effectiveFlow > 0 ? 0.2 + (effectiveFlow / MAX_RATED_FLOW) * 2.8 : 0;
 
     if (zoneAnimations[zId]) {
@@ -3152,7 +3160,6 @@ function setCircuitFlowRate(primaryZoneId, flowValueInLmin) {
       });
     }
 
-    // Hide dashes when flow is 0
     const flowDashes = document.querySelectorAll(`.pipe-flow path[data-zone="${zId}"]`);
     flowDashes.forEach(dashPath => {
       dashPath.style.opacity = effectiveFlow === 0 ? '0' : '1';
@@ -3169,160 +3176,121 @@ function setCircuitFlowRate(primaryZoneId, flowValueInLmin) {
 
 function syncSystemState() {
   const isFcActive = fcToggle ? fcToggle.checked : false;
-  const isMvActive = mvToggle ? mvToggle.checked : true;
+  const isAdvControlActive = mvToggle ? mvToggle.checked : true;
 
-  // Header update
+  // Header remains fixed as 'Opening Angle (%)'
   const headerEl = document.getElementById('flow-column-header');
   if (headerEl) {
-    headerEl.textContent = isMvActive ? 'MV (%)' : 'Flow (L/min)';
+    headerEl.textContent = 'l/min';
   }
 
-  // FC / MV status text
+  // Status Labels Update
   if (fcStatus) {
-    fcStatus.textContent = isFcActive ? "ON (REGULATED)" : "OFF (MAX)";
+    fcStatus.textContent = isFcActive ? "ON (REGULATED)" : "OFF (DIRECT)";
     fcStatus.style.color = isFcActive ? "#00a887" : "#ff5252";
   }
 
   if (mvStatus) {
-    mvStatus.textContent = isMvActive ? "ON (ACTIVE)" : "OFF (BYPASS)";
-    mvStatus.style.color = isMvActive ? "#00a887" : "#ff5252";
+    mvStatus.textContent = isAdvControlActive ? "ON (ADVANCED CONTROL)" : "OFF (PUMP BASELINE)";
+    mvStatus.style.color = isAdvControlActive ? "#00a887" : "#ff5252";
   }
 
-  const modeToggled = (wasMvActive !== isMvActive);
-
-  // Master slider sync
-  if (flowSlider) {
-    flowSlider.disabled = !isFcActive;
-    const maxMasterLimit = isMvActive ? 100 : MAX_RATED_FLOW;
-    flowSlider.setAttribute('max', maxMasterLimit);
-
-    let masterVal = parseFloat(flowSlider.value) || 0;
-
-    if (modeToggled) {
-      if (isMvActive) {
-        masterVal = Math.round((masterVal / MAX_RATED_FLOW) * 100);
-      } else {
-        masterVal = Math.round((masterVal / 100) * MAX_RATED_FLOW);
-      }
-      flowSlider.value = masterVal;
-    }
-
-    if (flowRateDisplay) {
-      flowRateDisplay.textContent = `${Math.round(masterVal)}${isMvActive ? '%' : ' L/min'}`;
-    }
-  }
-
-  // Circuit inputs sync
+  // Inputs are maintained directly in L/min
   document.querySelectorAll('.zone-flow-input').forEach(input => {
     input.disabled = !isFcActive;
-    const zoneId = input.getAttribute('data-zone');
-    const maxLimit = isMvActive ? 100 : MAX_RATED_FLOW;
-    
-    input.setAttribute('max', maxLimit);
+    let val = parseFloat(input.value) || 0;
 
-    let val = parseFloat(input.value);
-    if (isNaN(val) || val < 0) val = 0;
-
-    if (modeToggled) {
-      if (isMvActive) {
-        val = Math.round((val / MAX_RATED_FLOW) * 100);
-      } else {
-        val = Math.round((val / 100) * MAX_RATED_FLOW);
-      }
-      input.value = val;
+    const primaryZoneId = input.getAttribute('data-zone');
+    if (primaryZoneId) {
+      setCircuitFlowRate(primaryZoneId, val);
     }
-
-    if (val > maxLimit) {
-      val = maxLimit;
-      input.value = maxLimit;
-    }
-
-    const flowInLmin = isMvActive ? (val / 100) * MAX_RATED_FLOW : val;
-    setCircuitFlowRate(zoneId, flowInLmin);
   });
 
-  wasMvActive = isMvActive;
   updateValveVisuals();
 }
 
-function calculateStellgrad(flowLmin) {
-  if (flowLmin <= 0) return 0;
-  const pct = (flowLmin / MAX_RATED_FLOW) * 100;
-  return Math.min(100, Math.max(0, Math.round(pct)));
-}
-
 function updateValveVisuals() {
-  const isFcActive = fcToggle ? fcToggle.checked : false;
-  const isMvActive = mvToggle ? mvToggle.checked : true;
+  const isAdvControlActive = mvToggle ? mvToggle.checked : true;
 
-  const masterFlowInput = flowSlider ? parseFloat(flowSlider.value) || 0 : MAX_RATED_FLOW;
-  const masterFlowInLmin = isMvActive ? (masterFlowInput / 100) * MAX_RATED_FLOW : masterFlowInput;
+  // 1. Calculate active system flow metrics across all 4 channels
+  const channelFlows = {};
+  let totalFlow = 0;
+  let maxFlow = 0;
 
   for (let i = 1; i <= 4; i++) {
     const primaryZone = valveZoneMap[i];
-    
-    const rawFlow = zoneFlowRates[primaryZone] !== undefined ? zoneFlowRates[primaryZone] : MAX_RATED_FLOW;
-    
-    let requestedFlow = isFcActive ? rawFlow : masterFlowInLmin;
-    requestedFlow = Math.min(Math.max(requestedFlow, 0), MAX_RATED_FLOW);
+    const flow = zoneFlowRates[primaryZone] !== undefined ? zoneFlowRates[primaryZone] : 0;
+    channelFlows[i] = flow;
+    totalFlow += flow;
+    if (flow > maxFlow) {
+      maxFlow = flow;
+    }
+  }
 
-    const stellgradY = calculateStellgrad(requestedFlow);
+  // 2. Compute dynamic opening percentages
+  for (let i = 1; i <= 4; i++) {
+    const flowX = channelFlows[i];
+    let openingPct = 0;
 
-    const targetFlow =  requestedFlow;
-  
+    if (flowX > 0) {
+      if (isAdvControlActive) {
+        // Advanced Control ON: Channel with max flow opens to 80%, others scale relative to it
+        if (maxFlow > 0) {
+          openingPct = (80 / maxFlow) * flowX;
+        }
+      } else {
+        // Advanced Control OFF (Fixed relative to 100 L/min pump capacity)
+        // 10 L/min -> 10%
+        openingPct = (flowX / PUMP_MAX_FLOW) * 100;
+      }
+    }
+
+    openingPct = Math.min(Math.max(Math.round(openingPct), 0), 100);
+
+    // 3. Update DOM UI elements
     const flowEl = document.getElementById(`flow-val-${i}`);
-    if (flowEl) flowEl.textContent = Math.round(targetFlow);
+    if (flowEl) flowEl.textContent = Math.round(flowX);
 
     const badgeEl = document.getElementById(`valve-pct-${i}`);
-    if (badgeEl) badgeEl.textContent = isMvActive ? `${stellgradY}%` : '100%';
+    if (badgeEl) badgeEl.textContent = `${openingPct}%`;
 
     const mvPctEl = document.getElementById(`mv-pct-${i}`);
-    if (mvPctEl) mvPctEl.textContent = isMvActive ? `${stellgradY}%` : '100%';
+    if (mvPctEl) mvPctEl.textContent = `${openingPct}%`;
 
     const mvFillEl = document.getElementById(`mv-fill-${i}`);
-    if (mvFillEl) mvFillEl.style.width = isMvActive ? `${stellgradY}%` : '100%';
+    if (mvFillEl) mvFillEl.style.width = `${openingPct}%`;
 
+    // Dynamic Formula Readout Box
     const formulaEl = document.getElementById(`mv-formula-${i}`);
     if (formulaEl) {
-      formulaEl.textContent = isMvActive
-        ? `Y = (${Math.round(targetFlow)} / ${MAX_RATED_FLOW} L/min) × 100 = ${stellgradY}%`
-        : `MV OFF — Direct Passthrough (${Math.round(targetFlow)} L/min, Valve 100% Open)`;
+      if (isAdvControlActive) {
+        formulaEl.textContent = maxFlow > 0
+          ? `Opening = (80% / ${Math.round(maxFlow)} L/min) × ${Math.round(flowX)} L/min = ${openingPct}%`
+          : `0% (No Flow)`;
+      } else {
+        formulaEl.textContent = `Opening = (${Math.round(flowX)} L/min / 100 L/min) × 100% = ${openingPct}%`;
+      }
     }
 
+    // Pie Chart Visual Update
     const sliceEl = document.getElementById(`pie-slice-${i}`);
     if (sliceEl) {
-      const renderPct = isMvActive ? stellgradY : 100;
-      sliceEl.setAttribute('d', getPiePath(renderPct));
-      sliceEl.style.fill = !isMvActive ? '#00a887' : (stellgradY === 0 ? '#ff4d4d' : '#00a887');
+      sliceEl.setAttribute('d', getPiePath(openingPct));
+      sliceEl.style.fill = flowX === 0 ? '#ff4d4d' : '#00a887';
     }
   }
 
+  // 4. Update System-wide Math Formula Display
   const globalFormulaEl = document.getElementById('live-formula-math');
   if (globalFormulaEl) {
-    const activeDisplayFlow = isFcActive 
-      ? (zoneFlowRates[valveZoneMap[1]] !== undefined ? zoneFlowRates[valveZoneMap[1]] : MAX_RATED_FLOW)
-      : masterFlowInLmin;
-    const clampedFlow = Math.min(Math.max(activeDisplayFlow, 0), MAX_RATED_FLOW);
-
-    if (isMvActive) {
-      const overallMV = calculateStellgrad(clampedFlow);
-      globalFormulaEl.textContent = `Y = (${Math.round(clampedFlow)} L/min ÷ ${MAX_RATED_FLOW} L/min) × 100 = ${overallMV}%`;
+    if (isAdvControlActive) {
+      globalFormulaEl.textContent = maxFlow > 0
+        ? `Advanced Control: Max Flow = ${Math.round(maxFlow)} L/min (Scaled to 80% Opening Angle)`
+        : `Advanced Control: No active flow in system`;
     } else {
-      globalFormulaEl.textContent = `MV OFF — Direct Passthrough (${Math.round(clampedFlow)} L/min, Valve 100% Open)`;
+      globalFormulaEl.textContent = `Pump Baseline: Fixed 100 L/min system rating (Direct % calculation)`;
     }
   }
-}
-
-function getPiePath(pct) {
-  if (pct >= 100) return "M 0 -1 A 1 1 0 1 1 -0.0001 -1 Z";
-  if (pct <= 0) return "M 0 0 L 0 -1 Z";
-
-  const rad = (pct / 100) * 2 * Math.PI;
-  const x = Math.sin(rad);
-  const y = -Math.cos(rad);
-  const largeArc = pct > 50 ? 1 : 0;
-
-  return `M 0 0 L 0 -1 A 1 1 0 ${largeArc} 1 ${x.toFixed(4)} ${y.toFixed(4)} Z`;
 }
 
 function updatePhysics() {
@@ -3407,22 +3375,18 @@ function updatePhysics() {
 // Global Event Listeners
 document.addEventListener('input', (event) => {
   if (event.target.classList.contains('zone-flow-input')) {
-    const isMvActive = mvToggle ? mvToggle.checked : true;
-    const maxLimit = isMvActive ? 100 : MAX_RATED_FLOW;
-
     let val = parseFloat(event.target.value);
 
-    if (val > maxLimit) {
-      event.target.value = maxLimit;
-      val = maxLimit;
+    if (val > MAX_RATED_FLOW) {
+      event.target.value = MAX_RATED_FLOW;
+      val = MAX_RATED_FLOW;
     } else if (val < 0 || isNaN(val)) {
       val = 0;
     }
 
     const primaryZoneId = event.target.getAttribute('data-zone');
     if (primaryZoneId) {
-      const flowInLmin = isMvActive ? (val / 100) * MAX_RATED_FLOW : val;
-      setCircuitFlowRate(primaryZoneId, flowInLmin);
+      setCircuitFlowRate(primaryZoneId, val);
     }
     updateValveVisuals();
   }
@@ -3438,20 +3402,17 @@ if (mvToggle) {
 
 if (flowSlider) {
   flowSlider.addEventListener('input', (e) => {
-    const isMvActive = mvToggle ? mvToggle.checked : true;
     const isFcActive = fcToggle ? fcToggle.checked : false;
     const masterVal = parseFloat(e.target.value) || 0;
     
     if (flowRateDisplay) {
-      flowRateDisplay.textContent = `${Math.round(masterVal)}${isMvActive ? '%' : ' L/min'}`;
+      flowRateDisplay.textContent = `${Math.round(masterVal)} L/min`;
     }
     
     document.querySelectorAll('.zone-flow-input').forEach(input => {
       input.value = masterVal;
       const primaryZoneId = input.getAttribute('data-zone');
-      
-      const flowInLmin = isMvActive ? (masterVal / 100) * MAX_RATED_FLOW : masterVal;
-      const effectiveFlow = isFcActive ? flowInLmin : MAX_RATED_FLOW;
+      const effectiveFlow = isFcActive ? masterVal : MAX_RATED_FLOW;
 
       setCircuitFlowRate(primaryZoneId, effectiveFlow);
     });
