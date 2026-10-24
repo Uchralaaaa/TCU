@@ -577,6 +577,16 @@
   border: 1px solid rgba(0, 168, 135, 0.3);
   font-family: monospace;
 }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+#pump-rotor {
+  animation: spin 1s linear infinite;
+  animation-play-state: paused; /* Starts paused until system/pump runs */
+}
   </style>
 
 </head>
@@ -618,13 +628,10 @@
   </div>
 </div>
 
-  <!-- <div class="control-group">
-    <label for="flowSlider">Manual Flow Rate</label>
-    <div class="value-row">
-      <input type="range" id="flowSlider" min="0" max="80" value="80" />
-      <span class="unit-display"><span id="flowRate">80</span>
+  <div class="control-group" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+      <label style="margin:0;">Pump Speed</label>
+      <span id="pumpSpeedVal" style="color: #38bdf8; font-family: monospace; font-weight: bold; font-size: 14px;">0%</span>
     </div>
-  </div> -->
 
 
 
@@ -830,6 +837,24 @@
     width="570" 
     height="370" 
   />
+
+  <!-- ADDED: Internal Pump Window & Rotor Group -->
+  <g id="tcu-pump-window" transform="translate(230, 250) skewY(-25) scale(1.5, 1.4)">
+    <!-- Window Bezel / Outer Ring -->
+    <circle cx="0" cy="0" r="16" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+    <circle cx="0" cy="0" r="13" fill="#1e293b" />
+    
+    <!-- Animated Impeller Rotor -->
+<g id="pump-rotor">
+  <circle r="6" fill="#fff"/>
+  <path id="blade" d="M0,0 L-5,-12 C-1,-15 4,-14 3,-8 Z" fill="#38bdf8"/>
+  <use href="#blade" transform="rotate(90)"/>
+  <use href="#blade" transform="rotate(180)"/>
+  <use href="#blade" transform="rotate(270)"/>
+  <use href="#blade" transform="rotate(360)"/>
+  
+</g>
+  </g>
 </g>
 
 <!-- <g id="IMM" transform="translate(336 588)">
@@ -2880,7 +2905,7 @@
       <path d="M0 0C1.01521 0.141003 1.61057 0.397751 2.39126 1.06278C1.94289 1.27866 1.94289 1.27866 1.32848 1.32848C0.597816 0.680847 0.597816 0.680847 0 0Z" fill="#1E1E1E" transform="matrix(1 0 0 1 79.974 37.197)" />
     </g>
 
-    
+      
     <!-- Base Pipes -->
 <!-- LAYER 1: WHITE GAP OUTLINE (Depth Masking) -->
 <!-- 1. BOTTOM PIPES (Zones 2, 3, 4, 5) -->
@@ -3171,6 +3196,7 @@ function setCircuitFlowRate(primaryZoneId, flowValueInLmin) {
   });
 
   updateValveVisuals();
+  updatePumpFromSystem();
 }
 
 function syncSystemState() {
@@ -3417,6 +3443,7 @@ if (flowSlider) {
     });
 
     updateValveVisuals();
+    updatePumpFromSystem();
   });
 }
 
@@ -3449,7 +3476,49 @@ if (startBtn) {
       if (isRunning) anim.play();
       else anim.pause();
     });
+      updatePumpFromSystem();
   });
+}
+
+// Function to update pump speed and rotor based on active channel flows
+function updatePumpFromSystem() {
+  const pumpSpeedValDisplay = document.getElementById('pumpSpeedVal');
+  const pumpRotorElement = document.getElementById('pump-rotor');
+  const blurDisk = document.getElementById('pump-blur-disk');
+
+  let totalChannelFlow = 0;
+  for (let i = 1; i <= 4; i++) {
+    const primaryZone = valveZoneMap[i];
+    totalChannelFlow += (zoneFlowRates[primaryZone] || 0);
+  }
+
+  let flowPct = (totalChannelFlow / (MAX_RATED_FLOW * 3.2)) * 100;
+  flowPct = Math.min(Math.max(Math.round(flowPct), 0), 100);
+
+  if (pumpSpeedValDisplay) {
+    pumpSpeedValDisplay.textContent = `${flowPct}%`;
+  }
+
+  if (pumpRotorElement) {
+    if (!isRunning || flowPct === 0) {
+      pumpRotorElement.style.animationPlayState = 'paused';
+      if (blurDisk) blurDisk.style.opacity = '0';
+    } else {
+      pumpRotorElement.style.animationPlayState = 'running';
+      
+      // ULTRA-FAST SPEEDS:
+      // At 100% flow -> 0.03s per full turn (blazing fast industrial blur)
+      // At 10% flow  -> 1.2s per full turn (smooth slow rotation)
+      const rotDuration = flowPct > 0 ? (0.03 + (1 - flowPct / 100) * 1.15).toFixed(3) : 1.5;
+      pumpRotorElement.style.animationDuration = `${rotDuration}s`;
+
+      // Trigger the motion blur disk earlier (at 20% flow and above) for a realistic high-RPM effect
+      if (blurDisk) {
+        const blurOpacity = flowPct > 20 ? ((flowPct - 20) / 80) * 0.9 : 0;
+        blurDisk.style.opacity = blurOpacity.toFixed(2);
+      }
+    }
+  }
 }
 
 // Initial System Execution
