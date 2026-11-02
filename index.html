@@ -578,14 +578,45 @@
   font-family: monospace;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+/* Modern Pump & Rotor Styling Enhancements */
+.pump-container {
+  position: relative;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.4));
+  transition: transform 0.3s ease;
 }
 
+/* Glowing Industrial Housing Ring */
 #pump-rotor {
+  transform-origin: center;
   animation: spin 1s linear infinite;
-  animation-play-state: paused; /* Starts paused until system/pump runs */
+  animation-play-state: paused;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* High-Tech Radial Glow & HUD Ring */
+.pump-hud-ring {
+  fill: none;
+  stroke: rgba(0, 168, 135, 0.4);
+  stroke-width: 2;
+  stroke-dasharray: 4, 4;
+  animation: ringRotate 10s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* Glassmorphism Motion Blur Effect */
+#pump-blur-disk {
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
 }
   </style>
 
@@ -838,25 +869,49 @@
     height="370" 
   />
 
-  <!-- ADDED: Internal Pump Window & Rotor Group -->
+<!-- ADDED: Internal Pump Window & Rotor Group -->
   <g id="tcu-pump-window" transform="translate(230, 250) skewY(-25) scale(1.5, 1.4)">
-    <!-- Window Bezel / Outer Ring -->
+    <defs>
+      <!-- Radial gradient for glass depth -->
+      <radialGradient id="glassGrad" cx="30%" cy="30%" r="70%">
+        <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25" />
+        <stop offset="70%" stop-color="#0f172a" stop-opacity="0.9" />
+        <stop offset="100%" stop-color="#020617" stop-opacity="1" />
+      </radialGradient>
+    </defs>
+
+    <!-- Outer Bezel & Glow -->
+    <circle cx="0" cy="0" r="17" fill="none" stroke="#0ea5e9" stroke-width="1" opacity="0.6" />
     <circle cx="0" cy="0" r="16" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
-    <circle cx="0" cy="0" r="13" fill="#1e293b" />
+    
+    <!-- Recessed Window Interior with Gradient -->
+    <circle cx="0" cy="0" r="13" fill="url(#glassGrad)" />
+
+    <!-- Motion Blur Disk (Fades in when pump speeds up) -->
+    <circle id="pump-blur-disk" cx="0" cy="0" r="11" fill="#38bdf8" opacity="0" filter="blur(1px)" />
     
     <!-- Animated Impeller Rotor -->
-<g id="pump-rotor">
-  <circle r="6" fill="#fff"/>
-<path id="blade" d="M 0,0 C -1.5,-4 -7,-8 -2,-14 C -1,-11 0,-7 0,-4 Z" fill="#38bdf8"/>
-  <use href="#blade" transform="rotate(45)"/>
-  <use href="#blade" transform="rotate(90)"/>
-  <use href="#blade" transform="rotate(135)"/>
-  <use href="#blade" transform="rotate(180)"/>
-  <use href="#blade" transform="rotate(225)"/>
-  <use href="#blade" transform="rotate(270)"/>
-  <use href="#blade" transform="rotate(315)"/>
-  <use href="#blade" transform="rotate(360)"/>
-</g>
+    <g id="pump-rotor" style="transform-origin: 0px 0px;">
+      <!-- Center Core Cap with metallic look -->
+      <circle r="4" fill="#f8fafc" stroke="#0284c7" stroke-width="1"/>
+      <circle r="1.5" fill="#0284c7"/>
+
+      <!-- Sleeker, curved impeller blade -->
+      <path id="blade" d="M 0,0 C -2,-3 -6,-7 -1.5,-12 C -0.5,-8 0.5,-4 0,0 Z" fill="#38bdf8" opacity="0.95"/>
+      
+      <!-- 8-Blade Turbine Layout -->
+      <use href="#blade" transform="rotate(45)"/>
+      <use href="#blade" transform="rotate(90)"/>
+      <use href="#blade" transform="rotate(135)"/>
+      <use href="#blade" transform="rotate(180)"/>
+      <use href="#blade" transform="rotate(225)"/>
+      <use href="#blade" transform="rotate(270)"/>
+      <use href="#blade" transform="rotate(315)"/>
+    </g>
+
+    <!-- Glass Specular Highlight (Makes it look like curved convex glass) -->
+    <path d="M -8 -8 C -4 -11 4 -11 8 -8 C 4 -12 -4 -12 -8 -8 Z" fill="#ffffff" opacity="0.3" pointer-events="none" />
+  </g>
   </g>
 </g>
 
@@ -3484,6 +3539,7 @@ if (startBtn) {
 }
 
 // Function to update pump speed and rotor based on active channel flows
+// Updated function to also control Main Supply (6) and Return (7) flow matching total system flow
 function updatePumpFromSystem() {
   const pumpSpeedValDisplay = document.getElementById('pumpSpeedVal');
   const pumpRotorElement = document.getElementById('pump-rotor');
@@ -3494,6 +3550,27 @@ function updatePumpFromSystem() {
     const primaryZone = valveZoneMap[i];
     totalChannelFlow += (zoneFlowRates[primaryZone] || 0);
   }
+
+  // Sync main TCU lines (Zone 6 & Zone 7) to total active flow
+  const mainFlow = totalChannelFlow > 0 ? Math.min(totalChannelFlow, MAX_RATED_FLOW) : 0;
+  [6, 7].forEach(zId => {
+    zoneFlowRates[zId] = mainFlow;
+    
+    // Update animations for main zones
+    const playbackSpeed = mainFlow > 0 ? 0.2 + (mainFlow / MAX_RATED_FLOW) * 2.8 : 0;
+    if (zoneAnimations[zId]) {
+      zoneAnimations[zId].forEach(anim => {
+        anim.playbackRate = playbackSpeed;
+        if (isRunning && mainFlow > 0) anim.play();
+        else anim.pause();
+      });
+    }
+
+    // Update opacity of main flow lines
+    document.querySelectorAll(`.pipe-flow path[data-zone="${zId}"]`).forEach(dashPath => {
+      dashPath.style.opacity = mainFlow === 0 ? '0' : '1';
+    });
+  });
 
   let flowPct = (totalChannelFlow / (MAX_RATED_FLOW * 3.2)) * 100;
   flowPct = Math.min(Math.max(Math.round(flowPct), 0), 100);
@@ -3508,14 +3585,9 @@ function updatePumpFromSystem() {
       if (blurDisk) blurDisk.style.opacity = '0';
     } else {
       pumpRotorElement.style.animationPlayState = 'running';
-      
-      // ULTRA-FAST SPEEDS:
-      // At 100% flow -> 0.03s per full turn (blazing fast industrial blur)
-      // At 10% flow  -> 1.2s per full turn (smooth slow rotation)
       const rotDuration = flowPct > 0 ? (0.03 + (1 - flowPct / 100) * 1.15).toFixed(2) : 1.5;
       pumpRotorElement.style.animationDuration = `${rotDuration}s`;
 
-      // Trigger the motion blur disk earlier (at 20% flow and above) for a realistic high-RPM effect
       if (blurDisk) {
         const blurOpacity = flowPct > 20 ? ((flowPct - 20) / 80) * 0.9 : 0;
         blurDisk.style.opacity = blurOpacity.toFixed(2);
